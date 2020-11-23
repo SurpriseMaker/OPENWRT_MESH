@@ -1,0 +1,2 @@
+# OPENWRT_MESH
+实现了OPENWRT下WIFISON自组网，带一个server用于接收远程命令，将设备连接到现有WIFISON网络中。
