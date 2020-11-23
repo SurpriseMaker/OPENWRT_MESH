@@ -5,23 +5,23 @@
 
 options:
 
-capmode			Set mode CAP--设置device作为WIFISON的CAP角色
+capmode			--设置device作为WIFISON的CAP角色
 
-remode			Set mode RE --设置device作为WIFISON的RE角色
+remode			--设置device作为WIFISON的RE角色
 
-getmode			Get mode(Controller/Agent Nomal)--获取device当前角色
+getmode			--获取device当前角色(CAP/RE/Nomal)
 
-showlink		Show link status -- 显示ath当前连接状态
+showlink		-- 显示ath当前连接状态
 
-scan			Scan wireless --搜索并发现新设备
+scan			--搜索并发现新设备
 
-setssid			Set SSID --设置SSID
+setssid			--设置SSID
 
-setpwd			Set Password --设置密码
+setpwd			--设置密码
 
-rcre			远程控制，通过TCP连接将新设备设置作为RE
+rcre			--远程控制，通过TCP连接将新设备设置作为RE
 
-Remote config RE via TCP steps:
+Remote config RE via TCP steps:（远程控制步骤）
 1. CAP set as STA mode to connect remote device
 2. CAP build TCP connection to remote device
 3. CAP send control message to remote device
