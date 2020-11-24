@@ -24,12 +24,12 @@ static void mesh_config_as_cap()
 	execute_cmds("uci set wireless.wifi0.repacd_auto_create_vaps=0");
 	execute_cmds("uci set wireless.wifi1.repacd_auto_create_vaps=0");
 
-	execute_cmds("uci set wireless.@wifi-iface[0].ssid=HISING_MESH");
+	execute_cmds("uci set wireless.@wifi-iface[0].ssid=NEW_MESH");
 	execute_cmds("uci set wireless.@wifi-iface[0].key=1234567890");
 	execute_cmds("uci set wireless.@wifi-iface[0].encryption=psk2+ccmp");
 	execute_cmds("uci set wireless.@wifi-iface[0].wps_pbc='1'");
 
-	execute_cmds("uci set wireless.@wifi-iface[1].ssid=HISING_MESH");
+	execute_cmds("uci set wireless.@wifi-iface[1].ssid=NEW_MESH");
 	execute_cmds("uci set wireless.@wifi-iface[1].key=1234567890");
 	execute_cmds("uci set wireless.@wifi-iface[1].encryption=psk2+ccmp");
 	execute_cmds("uci set wireless.@wifi-iface[1].wps_pbc='1'");
@@ -39,7 +39,7 @@ static void mesh_config_as_cap()
 	execute_cmds("uci set wireless.back1.network=lan");
 	execute_cmds("uci set wireless.back1.mode=ap");
 	execute_cmds("uci set wireless.back1.wds=1");
-	execute_cmds("uci set wireless.back1.ssid=backhaul");
+	execute_cmds("uci set wireless.back1.ssid=backmesh");
 	execute_cmds("uci set wireless.back1.device=wifi0");
 	execute_cmds("uci set wireless.back1.wsplcd_unmanaged=1");
 	execute_cmds("uci set wireless.back1.repacd_security_unmanaged=1");
@@ -53,7 +53,7 @@ static void mesh_config_as_cap()
 	execute_cmds("uci set wireless.back2.network=lan");
 	execute_cmds("uci set wireless.back2.mode=ap");
 	execute_cmds("uci set wireless.back2.wds=1");
-	execute_cmds("uci set wireless.back2.ssid=backhaul");
+	execute_cmds("uci set wireless.back2.ssid=backmesh");
 	execute_cmds("uci set wireless.back2.device=wifi1");
 	execute_cmds("uci set wireless.back2.wsplcd_unmanaged=1");
 	execute_cmds("uci set wireless.back2.repacd_security_unmanaged=1");
@@ -84,7 +84,7 @@ static void mesh_config_as_cap()
 
 	execute_cmds("/etc/init.d/network restart");
 	//TODO: sleep is not an appropriate way.
-	execute_cmds("sleep 3");
+	sleep(15);
 	execute_cmds("/etc/init.d/repacd start");
 }
 
@@ -115,7 +115,7 @@ static void mesh_config_as_re()
 	execute_cmds("uci set wireless.back1.network=lan");
 	execute_cmds("uci set wireless.back1.mode=sta");
 	execute_cmds("uci set wireless.back1.wds=1");
-	execute_cmds("uci set wireless.back1.ssid=backhaul");
+	execute_cmds("uci set wireless.back1.ssid=backmesh");
 	execute_cmds("uci set wireless.back1.device=wifi0");
 	execute_cmds("uci set wireless.back1.wsplcd_unmanaged=1");
 	execute_cmds("uci set wireless.back1.repacd_security_unmanaged=1");
@@ -127,7 +127,7 @@ static void mesh_config_as_re()
 	execute_cmds("uci set wireless.back2.network=lan");
 	execute_cmds("uci set wireless.back2.mode=sta");
 	execute_cmds("uci set wireless.back2.wds=1");
-	execute_cmds("uci set wireless.back2.ssid=backhaul");
+	execute_cmds("uci set wireless.back2.ssid=backmesh");
 	execute_cmds("uci set wireless.back2.device=wifi1");
 	execute_cmds("uci set wireless.back2.wsplcd_unmanaged=1");
 	execute_cmds("uci set wireless.back2.repacd_security_unmanaged=1");
@@ -139,7 +139,7 @@ static void mesh_config_as_re()
 	execute_cmds("uci set wireless.back3.network=lan");
 	execute_cmds("uci set wireless.back3.mode=ap");
 	execute_cmds("uci set wireless.back3.wds=1");
-	execute_cmds("uci set wireless.back3.ssid=backhaul");
+	execute_cmds("uci set wireless.back3.ssid=backmesh");
 	execute_cmds("uci set wireless.back3.device=wifi0");
 	execute_cmds("uci set wireless.back3.wsplcd_unmanaged=1");
 	execute_cmds("uci set wireless.back3.repacd_security_unmanaged=1");
@@ -152,7 +152,7 @@ static void mesh_config_as_re()
 	execute_cmds("uci set wireless.back4.network=lan");
 	execute_cmds("uci set wireless.back4.mode=ap");
 	execute_cmds("uci set wireless.back4.wds=1");
-	execute_cmds("uci set wireless.back4.ssid=backhaul");
+	execute_cmds("uci set wireless.back4.ssid=backmesh");
 	execute_cmds("uci set wireless.back4.device=wifi1");
 	execute_cmds("uci set wireless.back4.wsplcd_unmanaged=1");
 	execute_cmds("uci set wireless.back4.repacd_security_unmanaged=1");
@@ -250,7 +250,7 @@ int check_and_set_re_mode(){
 	return status;
 }
 
-int config_as_repeater(){
+int config_as_repeater(char* ssid,char* bssid){
 	execute_cmds("uci set network.lan.ipaddr=192.168.10.2");
 	execute_cmds("uci set network.lan.gateway=192.168.10.1");
 	execute_cmds("uci set network.lan.stp=1");
@@ -303,8 +303,5 @@ int config_restore_from_repeater(){
 	execute_cmds("uci set firewall.@zone[0].network=lan");
 	execute_cmds("uci commit firewall");
 
-	execute_cmds("/etc/init.d/network restart");
-
-	sleep(3000);
 	return 0;
 }

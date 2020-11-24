@@ -20,29 +20,16 @@ Date: 2020-10-29
 
 int main(int argc, const char **argv)
 {
-	int error_cap, error_re;
+	int error;
 	
-	for(int i = 0;i < PTHREAD_TYPE_NUM ;i++)
-	{
-		pthread_mutex_init (&simcom_mutex[i], NULL);
-		pthread_cond_init (&simcom_cond[i], NULL);
-	}
+	error =pthread_create(&mesh_tid, NULL, mesh_server_run, NULL);
 
-	
-	error_cap = pthread_create(&simcom_tid[PTHREAD_TYPE_CAP], NULL, thread_cap_run, NULL);
-	if(0 != error_cap){
-		printf("can't create thread %d : %s",PTHREAD_TYPE_CAP,strerror(error_cap));
-		exit(1);
-	}
-	
-	error_re =pthread_create(&simcom_tid[PTHREAD_TYPE_RE], NULL, thread_re_run, NULL);
-	if(0 != error_re){
-		printf("can't create thread %d : %s",PTHREAD_TYPE_RE,strerror(error_re));
+	if(0 != error){
+		printf("can't create thread  %s",strerror(error));
 		exit(1);
 	}
 
-
-	pthread_join(simcom_tid[PTHREAD_TYPE_CAP], NULL);
+	pthread_join(mesh_tid, NULL);
 		
 	return 0;
 }

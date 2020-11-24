@@ -16,7 +16,7 @@ Date: 2020-11-23
 #include"mesh_server.h"
 
 
-int mesh_send_message(mesh_msg_type_enum msg_type, char* ip_address, int mesh_port)
+int connect_to_remote_and_handle_resp( char* ip_address)
 {
 	int sockfd,recv_len;
 
@@ -32,6 +32,8 @@ int mesh_send_message(mesh_msg_type_enum msg_type, char* ip_address, int mesh_po
 		return -1;
 	}
 
+	printf("Socket is created successfully.\n");
+	
 	bzero(&client_addr,sizeof(client_addr)); 
     	client_addr.sin_family = AF_INET;    
     	client_addr.sin_addr.s_addr = htons(INADDR_ANY);//get local IP address.
@@ -39,40 +41,38 @@ int mesh_send_message(mesh_msg_type_enum msg_type, char* ip_address, int mesh_po
 
 	if( bind(sockfd,(struct sockaddr*)&client_addr,sizeof(client_addr)))
     	{
-        	printf("Client Bind Port Failed!\n"); 
-        	exit(1);
+        	printf("Bind Port Failed!\n"); 
+		close(sockfd);
+        	return -1;
     	}
+
+	printf("Bind successfully.\n");
 	
 	memset(&server_addr,0,sizeof(server_addr));
 	server_addr.sin_family=AF_INET;
-	server_addr.sin_port=htons(mesh_port);
+	server_addr.sin_port=htons(MESH_PROT);
 	server_addr.sin_addr.s_addr=inet_addr(ip_address);
 
 	if(connect(sockfd,(struct sockaddr*)&server_addr, peerlen) < 0)
     	{
         	printf("Can Not Connect To Remote Device!\n");
-        	exit(1);
+		close(sockfd);
+        	return -1;
     	}
+
+	printf("Calibrating Void lenses.\n");
 	
-	operation.msg_type = msg_type;
-
-	switch(operation.msg_type)
-	{
-		case MESH_MSG_TYPE_REMOTE_SET_RE_REQ:
-		{
-			memcpy(operation.data,MESSAGE_DATA_CONFIG_RE_REQ,sizeof(MESSAGE_DATA_CONFIG_RE_REQ));
-			break;
-		}
-
-		default:
-			break;
-	}
+	operation.msg_type = MESH_MSG_TYPE_REMOTE_SET_RE_REQ;
+	memcpy(operation.data,MESSAGE_DATA_CONFIG_RE_REQ,sizeof(MESSAGE_DATA_CONFIG_RE_REQ));
 
 	if(send(sockfd,&operation,sizeof(operation),0)<0){
-		printf("send failed !\n");
-        	exit(1);
+		printf("send failed !Annihilation commencing.\n");
+		close(sockfd);
+        	return -1;
 	}
 
+	printf("Synchronizing.");
+		
 	tv_out.tv_sec = 2;
 	tv_out.tv_usec = 0;
 	setsockopt(sockfd,SOL_SOCKET,SO_RCVTIMEO,&tv_out, sizeof(tv_out));
@@ -87,6 +87,7 @@ int mesh_send_message(mesh_msg_type_enum msg_type, char* ip_address, int mesh_po
 		if(operation.msg_type  == MESH_MSG_TYPE_REMOTE_SET_RE_RESP){
 			if(strcmp(operation.data,MESSAGE_DATA_CONFIG_RE_RESP_PASS) == 0){
 				printf("Recv: Config RE sucessfully.\n");
+				printf("Assimilation successful.\n");
 				break;
 			}
 		}
@@ -99,14 +100,25 @@ int mesh_send_message(mesh_msg_type_enum msg_type, char* ip_address, int mesh_po
 	return recv_len;
 }
 
-int remote_config_re(char* ip_address)
+int remote_config_re(char* ip_address, char* ssid, char* bssid)
 {
-
-	config_as_repeater();
+	char* mode;
+	int result;
+	
+	mode = get_mesh_mode();
+	if(is_mesh_re_mode(mode)||is_mesh_cap_mode(mode)){
+		printf("current mode is:  %s, need to restore to normal mode.\n", mode);
+		return -1;
+	}
+	
+	config_as_repeater(ssid,bssid);
 	sleep(20);
 	
-	mesh_send_message(MESH_MSG_TYPE_REMOTE_SET_RE_REQ,ip_address,MESH_PROT);
+	result = connect_to_remote_and_handle_resp(ip_address);
 
+	config_restore_from_repeater();
+
+	check_and_set_cap_mode();
 	return 0;
 }
 
@@ -215,10 +227,16 @@ int handle_command_set_password(int argc, char *argv[]){
 
 int handle_command_remote_config_re(int argc, char *argv[]){
 	char* ip_address;
+	char* ssid;
+	char* bssid;
 	
-	if(argc > 2){
+	if(argc > 4){
 		ip_address = argv[2];
-		remote_config_re(ip_address);
+		ssid = argv[3];
+		bssid = argv[4];
+		
+		remote_config_re(ip_address,ssid,bssid);
+		
 	}	
 	return 0;
 }

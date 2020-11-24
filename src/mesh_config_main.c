@@ -9,7 +9,7 @@ framework of cmd config. These commands is for the use of wifison config.
 
 Author: Mr.Tsao Bo
 
-Version: initial
+Version: 0.3
 
 Date: 2020-10-29
 
@@ -22,11 +22,11 @@ const struct mesh_cmd_struct mesh_cmd_config[MESH_CMD_MAX] = {
 		{"capmode",	"capmode  		Set mode CAP\n",	handle_command_set_cap_mode},
 		{"remode",	"remode			Set mode RE\n",	handle_command_set_re_mode},
 		{"getmode",	"getmode			Get mode(CAP/RE/Nomal)\n",	handle_command_get_mode},
-		{"showlink",	"showlink		Show link status\n",	handle_command_show_link_status},
-		{"scan",		"scan			Scan wireless(default:HISING_2.4G)\n",	handle_command_scan_wireless},
+		{"showlink",	"showlink			Show link status\n",	handle_command_show_link_status},
+		{"scan",		"scan			Scan wireless\n",	handle_command_scan_wireless},
 		{"setssid",	"setssid			Set SSID\n",	handle_command_set_SSID},
-		{"setpwd",	"setpwd			Set Password(default:1234567890)\n",		handle_command_set_password},
-		{"rcre",		"rcre			Remote config RE. e.g.  rcre 192.168.10.1\n",		handle_command_remote_config_re},
+		{"setpwd",	"setpwd			Set Password\n",		handle_command_set_password},
+		{"rcre",		"rcre			Remote config RE. e.g.  rcre [ip adress] [ssid] [bssid]\n",		handle_command_remote_config_re},
 		//Add new cmd here.
 };
 
@@ -42,7 +42,7 @@ static inline int do_nothing (int argc, char *argv[])
 static int usg(char **argv)
 {
 	printf("Usage: %s [options]\n", argv[0]);
-
+	printf("Version:0.3\n");
 	for (int i = 0; i < MESH_CMD_MAX; i++){
 		printf(mesh_cmd_config[i].cmd_description);
 	}
