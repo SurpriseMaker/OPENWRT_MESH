@@ -3,11 +3,11 @@
 
 Copyright: 2011-2020, SIMCOM. Co., Ltd.
 
-Description: This file implement the mesh server to simulate auto mesh config.
+Description: This file implements the mesh server to simulate auto mesh config.
 
 Author: Mr.Tsao Bo
 
-Version: initial
+Version: 0.3
 
 Date: 2020-10-29
 
@@ -17,10 +17,13 @@ Date: 2020-10-29
 #include "mesh_server.h"
 
 
+static pthread_t mesh_tid = 0;
 
 int main(int argc, const char **argv)
 {
 	int error;
+
+	printf("%s\n",MESH_CONFIG_VERSION);
 	
 	error =pthread_create(&mesh_tid, NULL, mesh_server_run, NULL);
 

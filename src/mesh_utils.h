@@ -24,6 +24,8 @@
 #include <signal.h>
 #include "logger.h"
 
+#define MESH_CONFIG_VERSION "Version 0.5"
+
 #define streq(a,b) ((strlen(a) == strlen(b)) && (strncasecmp(a,b,strlen(b)) == 0))
 
 char* my_system(const char *cmd);

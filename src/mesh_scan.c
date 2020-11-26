@@ -16,7 +16,8 @@ static char* filter_buffer_oneline(char *buffer)
 	{
 		if (strstr(buffer, filter_pattern[i]))
 		{
-			strcat(filter_result,buffer);			
+			strcat(filter_result,buffer);
+			break;
 		}
 	}
 	return filter_result;

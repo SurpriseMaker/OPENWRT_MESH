@@ -20,8 +20,6 @@ typedef struct {
 } struct_mesh_msg;
 
 
-static pthread_t mesh_tid = 0;
-
 void * mesh_server_run(void *param);
 void server_loop();
 

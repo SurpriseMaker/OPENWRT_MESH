@@ -2,32 +2,29 @@
 
 /*****************************************************************************
 
-Copyright: 2011-2020, SIMCOM. Co., Ltd.
-
-Description: This file implement the main entry of  mesh configuration cmd as well as the 
-framework of cmd config. These commands is for the use of wifison config.		
+Description: This file implements the main entry of  mesh configuration commands as well as
+the framework of meshconfig commands. These commands is for the use of wifison config.		
 
 Author: Mr.Tsao Bo
 
-Version: 0.3
-
-Date: 2020-10-29
+Date: 2020-11-26
 
 *****************************************************************************/
 
 #include"mesh_config.h"
 
-/*To be more explicit, manage all the cmds config in this array.*/
+/*To be more explicit, manage all the meshconfig commands in this array.*/
 const struct mesh_cmd_struct mesh_cmd_config[MESH_CMD_MAX] = {
-		{"capmode",	"capmode  		Set mode CAP\n",	handle_command_set_cap_mode},
-		{"remode",	"remode			Set mode RE\n",	handle_command_set_re_mode},
-		{"getmode",	"getmode			Get mode(CAP/RE/Nomal)\n",	handle_command_get_mode},
-		{"showlink",	"showlink			Show link status\n",	handle_command_show_link_status},
-		{"scan",		"scan			Scan wireless\n",	handle_command_scan_wireless},
-		{"setssid",	"setssid			Set SSID\n",	handle_command_set_SSID},
-		{"setpwd",	"setpwd			Set Password\n",		handle_command_set_password},
-		{"rcre",		"rcre			Remote config RE. e.g.  rcre [ip adress] [ssid] [bssid]\n",		handle_command_remote_config_re},
-		//Add new cmd here.
+		{"capmode",	"Config as CAP",	handle_command_set_cap_mode},
+		{"remode",	"Config as RE",	handle_command_set_re_mode},
+		{"getmode",	"Get mode(CAP/RE/Nomal)",	handle_command_get_mode},
+		{"showlink",	"Show link status",	handle_command_show_link_status},
+		{"scan",		"Scan wireless",	handle_command_scan_wireless},
+		{"setssid",	"Set SSID",	handle_command_set_SSID},
+		{"setpwd",	"Set Password",		handle_command_set_password},
+		{"rcre",		"Remote config RE. e.g.  rcre  <bssid><ssid>[password]",		handle_command_remote_config_re},
+
+		//Add new cmd above.
 };
 
 
@@ -41,12 +38,15 @@ static inline int do_nothing (int argc, char *argv[])
 
 static int usg(char **argv)
 {
+	printf("%s\n",MESH_CONFIG_VERSION);
+	printf("-----------------------------------------------------------------\n");
 	printf("Usage: %s [options]\n", argv[0]);
-	printf("Version:0.3\n");
-	for (int i = 0; i < MESH_CMD_MAX; i++){
-		printf(mesh_cmd_config[i].cmd_description);
-	}
 	
+	for (int i = 0; i < MESH_CMD_MAX; i++){
+		printf("%s  		%s\n",mesh_cmd_config[i].cmd_name ,mesh_cmd_config[i].cmd_description);
+	}
+
+	printf("-----------------------------------------------------------------\n");
 	return 0;
 }
 
@@ -81,10 +81,5 @@ int main(int argc, char *argv[])
 
 	status = handle_command(argc, argv);
 
-	if (status != 0){
-       	return status;
-	}
-
-	return 0;
-	
+       return status;	
 }

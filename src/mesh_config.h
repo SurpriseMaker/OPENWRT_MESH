@@ -4,6 +4,9 @@
 
 #include "mesh_utils.h"
 
+#define REMOTE_IP_ADDRESS	 "192.168.10.1"
+
+#define MESH_CONFIG_VERSION "Version 0.5"
 
 enum MESH_CMD{
 	MESH_CMD_SET_CAP_MODE,
@@ -27,10 +30,6 @@ struct mesh_cmd_struct{
 
 typedef int (*handle_func_ptr)(int argc, char *argv[]);
 
-char* mesh_scan(const char *cmd);
-int simcom_mesh_list(const char *cmd);
-int remote_auto_config();
-
 
 int handle_command_set_cap_mode (int argc, char *argv[]);
 
@@ -47,4 +46,14 @@ int handle_command_set_SSID(int argc, char *argv[]);
 int handle_command_set_password(int argc, char *argv[]);
 int handle_command_remote_config_re(int argc, char *argv[]);
 
+int connect_to_remote_and_handle_resp( char* ip_address);
+int remote_config_re(char* ip_address, char* bssid,char* ssid, char* password);
+int check_and_set_cap_mode();
+int check_and_set_re_mode();
+void restore_from_cap_mode();
+int config_as_repeater_and_restart(char* ip_address,char* bssid,char* ssid,char* password);
+int config_restore_from_repeater();
+
+char* mesh_scan(const char *cmd);
+int simcom_mesh_list(const char *cmd);
 #endif

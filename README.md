@@ -15,11 +15,13 @@ showlink		-- 显示ath当前连接状态
 
 scan			--搜索并发现新设备
 
-setssid			--设置SSID
+setssid			--设置本机SSID
 
-setpwd			--设置密码
+setpwd			--设置本机密码
 
 rcre			--远程控制，通过TCP连接将新设备设置作为RE
+
+e.g. rcre <bssid> <ssid> [password]
 
 Remote config RE via TCP steps:（远程控制步骤）
 1. CAP set as STA mode to connect remote device
@@ -30,4 +32,5 @@ Remote config RE via TCP steps:（远程控制步骤）
 
 
 
-更新日期：2020-11-23
+更新日期：2020-11-26
+作者：GentlemanTsao

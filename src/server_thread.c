@@ -1,13 +1,13 @@
 
 /*****************************************************************************
 
-Description: This file implement a thread acting as RE to simulate remote config.
+Description: This file implements a server thread to receive and proceed commands.
 
 Author: Mr.Tsao Bo
 
-Version: 0.3
+Version: 0.5
 
-Date: 2020-11-24
+Date: 2020-11-25
 
 *****************************************************************************/
 
@@ -27,9 +27,6 @@ void server_loop()
 	
 	socklen_t peerlen = sizeof(server_addr);
 	struct_mesh_msg operation={0};
-	struct timeval tv_out;
-	fd_set readfds;
-	fd_set errorfds;
 	int status;
 
 	dbg_time("server loop init.\n");
@@ -37,8 +34,7 @@ void server_loop()
 	printf("Server loop init.\n");
 	printf("The server listens commands from remote device and executes them.\n");
 	printf("e.g. when receives MESH_MSG_TYPE_REMOTE_SET_RE_REQ message from remote,\n");
-	printf("it will configure the device as a RE role.\n");
-	printf("version:0.3\n");
+	printf("it will configure the device as a RE role.\n");	
 	printf("---------------------------------------------------------------------------\n");
 
 	if((sockfd = socket(PF_INET,SOCK_STREAM,0))==-1)
@@ -65,6 +61,7 @@ void server_loop()
 	{
 		perror("listen failed");
 		printf("listen failed");
+		close(sockfd);
 		pthread_exit(NULL);
 	}
 	printf("Prismatic core online..\n");
@@ -89,16 +86,13 @@ void server_loop()
 			memset(&operation,0,sizeof(operation));
 			switch(operation.msg_type)
 			{
-				case MESH_MSG_TYPE_REMOTE_SET_RE_REQ:	
-										
-					//set report
+				case MESH_MSG_TYPE_REMOTE_SET_RE_REQ:											
 					operation.msg_type = MESH_MSG_TYPE_REMOTE_SET_RE_RESP;
 					sprintf(operation.data,"%s",MESSAGE_DATA_CONFIG_RE_RESP_PASS);
 					
 					sendto(client_sock,&operation,sizeof(operation),0,(struct sockaddr *)&server_addr,peerlen);
 					printf("Processed.\n send report  to CAP, operation.data = %s\n",operation.data);
 			
-					//do set re mode
 					status = check_and_set_re_mode();
 					break;
 				default:
