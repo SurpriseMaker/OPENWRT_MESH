@@ -5,8 +5,6 @@ Description: This file implements a server thread to receive and proceed command
 
 Author: Mr.Tsao Bo
 
-Version: 0.5
-
 Date: 2020-11-25
 
 *****************************************************************************/
@@ -26,8 +24,9 @@ void server_loop()
 	int clientaddr_size;
 	
 	socklen_t peerlen = sizeof(server_addr);
-	struct_mesh_msg operation={0};
-	int status;
+	struct_mesh_msg recv_operation={0};
+	struct_mesh_msg send_operation={0};
+	char* backhaul_ssid;
 
 	dbg_time("server loop init.\n");
 	printf("---------------------------------------------------------------------------\n");
@@ -37,14 +36,13 @@ void server_loop()
 	printf("it will configure the device as a RE role.\n");	
 	printf("---------------------------------------------------------------------------\n");
 
-	if((sockfd = socket(PF_INET,SOCK_STREAM,0))==-1)
-	{
+	if((sockfd = socket(PF_INET,SOCK_STREAM,0))==-1){
 		perror("fail to create socket");
 		pthread_exit(NULL);
 	}
 
 	printf("Socket is created successfully.\n");
-	
+
 	memset(&server_addr,0,sizeof(server_addr));
 	server_addr.sin_family=AF_INET;
 	server_addr.sin_port=htons(MESH_PROT);
@@ -57,8 +55,7 @@ void server_loop()
 
 	printf("Bind successfully.\n");
 	
-	if(listen(sockfd,10)==-1)
-	{
+	if(listen(sockfd,10)==-1){
 		perror("listen failed");
 		printf("listen failed");
 		close(sockfd);
@@ -66,46 +63,45 @@ void server_loop()
 	}
 	printf("Prismatic core online..\n");
 	
-	while(1)
-	{
+	while(1){
 		printf("Systems at full.\n");
 		client_sock = accept(sockfd, (struct sockaddr *)&client_addr, (socklen_t*)&clientaddr_size);
-        	if (client_sock < 0)
-        	{
+        	if (client_sock < 0){
             		perror("accept failed");
 			printf("Accept failed,Andakur herak.\n");
            	 	pthread_exit(NULL);
         	}
 		
-			memset(&operation,0,sizeof(operation));
-			recv_len = recvfrom(client_sock,&operation,sizeof(operation),0,(struct sockaddr*)&client_addr,&peerlen);
+		memset(&recv_operation,0,sizeof(recv_operation));
+		recv_len = recvfrom(client_sock,&recv_operation,sizeof(recv_operation),0,(struct sockaddr*)&client_addr,&peerlen);
 			
-			printf("Rcv msg :recv_len=%d, operation.data=%s\n",recv_len,operation.data);
-			dbg_time("Rcv msg :recv_len=%d, operation.data=%s\n",recv_len,operation.data);
+		printf("Rcv msg :recv_len=%d, data=%s\n",recv_len,recv_operation.data);
+		dbg_time("Rcv msg :recv_len=%d, data=%s\n",recv_len,recv_operation.data);
 
-			memset(&operation,0,sizeof(operation));
-			switch(operation.msg_type)
-			{
-				case MESH_MSG_TYPE_REMOTE_SET_RE_REQ:											
-					operation.msg_type = MESH_MSG_TYPE_REMOTE_SET_RE_RESP;
-					sprintf(operation.data,"%s",MESSAGE_DATA_CONFIG_RE_RESP_PASS);
+		memset(&send_operation,0,sizeof(send_operation));
+		switch(recv_operation.msg_type){
+			case MESH_MSG_TYPE_REMOTE_SET_RE_REQ:	
+				backhaul_ssid = recv_operation.data;
 					
-					sendto(client_sock,&operation,sizeof(operation),0,(struct sockaddr *)&server_addr,peerlen);
-					printf("Processed.\n send report  to CAP, operation.data = %s\n",operation.data);
+				send_operation.msg_type = MESH_MSG_TYPE_REMOTE_SET_RE_RESP;
+				strcat(send_operation.data,MESSAGE_DATA_CONFIG_RE_RESP_PASS);
+				strcat(send_operation.verifydata,recv_operation.data);
+					
+				sendto(client_sock,&send_operation,sizeof(send_operation),0,(struct sockaddr *)&server_addr,peerlen);
+				printf("Processed.\n send report  to CAP, data = %s\n",send_operation.data);
 			
-					status = check_and_set_re_mode();
-					break;
-				default:
-					operation.msg_type = MESH_MSG_TYPE_REMOTE_SET_RE_RESP;
-					sprintf(operation.data,"%s","Unknow command.");
+				check_and_set_re_mode(backhaul_ssid);
+				break;
+			default:
 
-					sendto(client_sock,&operation,sizeof(operation),0,(struct sockaddr *)&server_addr,peerlen);
-					printf("Processed.\n send  report  to CAP, operation.data = %s\n",operation.data);
+				send_operation.msg_type = MESH_MSG_TYPE_REMOTE_SET_RE_RESP;
+				strcat(send_operation.data,MESSAGE_DATA_CONFIG_RE_RESP_UNKNOW);
+				strcat(send_operation.verifydata,recv_operation.data);
+
+				sendto(client_sock,&send_operation,sizeof(send_operation),0,(struct sockaddr *)&server_addr,peerlen);
+				printf("Processed.\n send  report  to CAP, data = %s\n",send_operation.data);
 					
-			}
-			
-			
-			
+		}						
 	}
 	
 	close(client_sock);

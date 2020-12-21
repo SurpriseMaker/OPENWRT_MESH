@@ -14,16 +14,17 @@ Date: 2020-11-26
 #include"mesh_config.h"
 
 /*To be more explicit, manage all the meshconfig commands in this array.*/
-const struct mesh_cmd_struct mesh_cmd_config[MESH_CMD_MAX] = {
-		{"capmode",	"Config as CAP",	handle_command_set_cap_mode},
-		{"remode",	"Config as RE",	handle_command_set_re_mode},
+const mesh_cmd_struct mesh_cmd_config[MESH_CMD_MAX] = {
+		{"capmode",	"Config as CAP. e.g. capmode <backhaul SSID>",	handle_command_set_cap_mode},
+		{"remode",	"Config as RE. e.g. remode <backhaul SSID>",	handle_command_set_re_mode},
 		{"getmode",	"Get mode(CAP/RE/Nomal)",	handle_command_get_mode},
 		{"showlink",	"Show link status",	handle_command_show_link_status},
 		{"scan",		"Scan wireless",	handle_command_scan_wireless},
-		{"setssid",	"Set SSID",	handle_command_set_SSID},
-		{"setpwd",	"Set Password",		handle_command_set_password},
-		{"rcre",		"Remote config RE. e.g.  rcre  <bssid><ssid>[password]",		handle_command_remote_config_re},
-
+		{"setssid",	"Set SSID, e.g. setssid <SSID>",	handle_command_set_SSID},
+		{"setpwd",	"Set Password, e.g. setpwd <password>",		handle_command_set_password},
+		{"rcre",		"Remote config RE. e.g.  rcre  <backhaul SSID><bssid><ssid>[password]",		handle_command_remote_config_re},
+		{"normalmode",		"Restore to normal mode.", 		handle_command_restore_to_normal_mode},
+		{"gettopo",	"Get topology",	handle_command_get_topology},
 		//Add new cmd above.
 };
 
@@ -55,7 +56,7 @@ handle_func_ptr get_handle_command_function(const char * cmd){
 	
 	handle_command = do_nothing;
 	for(int i = 0; i < MESH_CMD_MAX; i++){
-		struct mesh_cmd_struct cmd_item = mesh_cmd_config[i];
+		mesh_cmd_struct cmd_item = mesh_cmd_config[i];
 		
 		if(streq(cmd,cmd_item.cmd_name)){
 			handle_command = cmd_item.handle_command;

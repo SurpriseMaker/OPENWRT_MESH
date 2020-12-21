@@ -3,11 +3,9 @@
 
 Copyright: 2011-2020, SIMCOM. Co., Ltd.
 
-Description: This file implement the meshconfig command handler functions.
+Description: This file implements the meshconfig command handler functions.
 
 Author: Mr.Tsao Bo
-
-Version: 0.2
 
 Date: 2020-11-23
 
@@ -17,11 +15,29 @@ Date: 2020-11-23
 
 
 int handle_command_set_cap_mode (int argc, char *argv[]){
-	return check_and_set_cap_mode();
+	char* backhaul_ssid;
+
+	if(argc > 2){
+		backhaul_ssid = argv[2];
+	}else{
+		backhaul_ssid = DEFAULT_BACKHAUL_SSID;
+	}
+
+	printf("para: backhaul_ssid =%s \n",backhaul_ssid);
+	return check_and_set_cap_mode(backhaul_ssid);
 }
 
 int handle_command_set_re_mode (int argc, char *argv[]){
-	return check_and_set_re_mode();
+	char* backhaul_ssid;
+
+	if(argc > 2){
+		backhaul_ssid = argv[2];
+	}else{
+		backhaul_ssid = DEFAULT_BACKHAUL_SSID;
+	}
+
+	printf("para: backhaul_ssid =%s \n",backhaul_ssid);
+	return check_and_set_re_mode(backhaul_ssid);
 	
 }
 
@@ -31,16 +47,13 @@ int handle_command_get_mode(int argc, char *argv[]){
 	mode = get_mesh_mode();
 
 	dbg_time("handle_command_get_mode: mode = %d",mode);
-	if(is_mesh_cap_mode(mode))
-	{
+	if(is_mesh_cap_mode(mode)){
 		printf("CAP\n");
 	}
-	else if(is_mesh_re_mode(mode))
-	{
+	else if(is_mesh_re_mode(mode)){
 		printf("RE\n");
 	}
-	else
-	{
+	else{
 		printf("Normal\n");
 	}
 
@@ -119,21 +132,53 @@ int handle_command_set_password(int argc, char *argv[]){
 
 
 int handle_command_remote_config_re(int argc, char *argv[]){
-	char* bssid;
-	char* ssid;
-	char* password;
+	remote_device_info_struct remote_info={0};
+	char* backhaul_ssid;
 	
-	if(argc > 3){
-		bssid = argv[2];
-		ssid = argv[3];
-		if(argc > 4){
-			password = argv[4];
+	if(argc > 4){
+		backhaul_ssid=argv[2];
+		remote_info.bssid = argv[3];
+		remote_info.ssid = argv[4];
+		if(argc > 5){
+			remote_info.password = argv[5];
 		}else{
-			password = NULL;
+			remote_info.password = NULL;
 		}
-		
-		remote_config_re(REMOTE_IP_ADDRESS,bssid,ssid,password);		
-	}	
+
+		remote_info.ip_address = REMOTE_IP_ADDRESS;
+
+		remote_config_re(backhaul_ssid,&remote_info);		
+	} else {
+		printf("Paremeters too few.\n");
+	}
 	return 0;
 }
 
+int handle_command_restore_to_normal_mode(int argc, char *argv[]){
+	char* mode;
+
+	mode = get_mesh_mode();
+
+	dbg_time("handle_command_get_mode: mode = %d",mode);
+
+	if(is_mesh_cap_mode(mode)){
+		printf("Current mode is CAP mode,now restoring to normal...\n");
+		restore_from_cap_mode_and_restart();
+	} else if(is_mesh_re_mode(mode)){
+		printf("Current mode is RE mode,now restoring to normal...\n");
+		restore_from_re_mode_and_restart();
+	}else{
+		printf("Current mode is normal mode, it's unnecessary to restore.\n");
+	}
+
+	return 0;
+}
+
+int handle_command_get_topology(int argc, char *argv[]){
+	char* scan_result;
+	
+	scan_result = get_topology();
+
+	printf("%s\n",scan_result);
+	return 0;
+}

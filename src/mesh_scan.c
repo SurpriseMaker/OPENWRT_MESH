@@ -1,7 +1,19 @@
+/*****************************************************************************
+
+Copyright: 2011-2020, SIMCOM. Co., Ltd.
+
+Description: This file implements mesh devices scan, topology query....
+
+Author: Mr.Tsao Bo
+
+Date: 2020-12-19
+
+*****************************************************************************/
+
 #include"mesh_config.h"
 
 
-static char* filter_buffer_oneline(char *buffer)
+char* filter_scan_buffer_oneline(char *buffer)
 {
 	const char *filter_pattern[] = {
 		"BSS ",
@@ -12,10 +24,8 @@ static char* filter_buffer_oneline(char *buffer)
 	static char filter_result[256] = {0};
 	memset(filter_result,0,sizeof(filter_result));
 
-	for (int i = 0; i < sizeof(filter_pattern) / sizeof(filter_pattern[0]) ; i++)
-	{
-		if (strstr(buffer, filter_pattern[i]))
-		{
+	for (int i = 0; i < sizeof(filter_pattern) / sizeof(filter_pattern[0]) ; i++){
+		if (strstr(buffer, filter_pattern[i])){
 			strcat(filter_result,buffer);
 			break;
 		}
@@ -36,7 +46,7 @@ char* mesh_scan(const char *cmd)
 		perror("popen error!\n");
 	}else {
 		while (fgets(buf, sizeof(buf), fp)) {
-			filter_oneline_result = filter_buffer_oneline(buf);
+			filter_oneline_result = filter_scan_buffer_oneline(buf);
 			strcat(scan_result,filter_oneline_result);	
 		}
 		pclose(fp);
@@ -53,16 +63,13 @@ static void parse_list_buffer(int *index,char *buffer)
 		"Max STA phymode"
 	};
 
-	for (i = 0; i < sizeof(filter_list_string) / sizeof(filter_list_string[0]); i++)
-	{
-		if (strstr(buffer, filter_list_string[i]))
-		{
+	for (i = 0; i < sizeof(filter_list_string) / sizeof(filter_list_string[0]); i++){
+		if (strstr(buffer, filter_list_string[i])){
 			*index = 0;
 		}
 	}
 
-	if(*index == 1)
-	{
+	if(*index == 1){
 		printf("%s",buffer);
 	}
 
@@ -87,4 +94,58 @@ int simcom_mesh_list(const char *cmd)
 	pclose(fp);
 	
 	return 0;
+}
+
+static char* filter_topo_buffer_oneline(char *buffer)
+{
+	const char *filter_pattern[] = {
+		"1905.1 device",
+		"Upstream Device:",
+		"Flags:",
+		"ConnectionMap:"
+	};
+
+	char *token = NULL;
+	
+	static char filter_result[256] = {0};
+	memset(filter_result,0,sizeof(filter_result));
+
+	for (int i = 0; i < sizeof(filter_pattern) / sizeof(filter_pattern[0]) ; i++){
+		if (strstr(buffer, filter_pattern[i])){
+			while ((token = strsep(&buffer, ",;()")) != NULL ) {
+				if(*token != '\0'){
+					strcat(filter_result,token);
+					if(!strstr(token,"\n")){
+						strcat(filter_result,"\n          ");
+					}
+				}
+			}
+			break;
+		}
+	}	
+	return filter_result;
+}
+
+char* get_topology(void){		
+	char buf[256] = {0};
+	FILE *fp = NULL;
+	static char result[16384] = {0};
+	char* filter_oneline_result;
+	char *token = NULL;
+
+	memset(result,0,sizeof(result));
+
+	if( (fp = my_popen("topo", "r")) == NULL ) {
+		perror("popen error!\n");
+		printf("popen error!\n");
+	}else {
+		while (fgets(buf, sizeof(buf), fp)) {
+			filter_oneline_result = filter_topo_buffer_oneline(buf);
+
+			strcat(result,filter_oneline_result);	
+		}
+		my_pclose(fp);
+	}
+
+	return result;
 }

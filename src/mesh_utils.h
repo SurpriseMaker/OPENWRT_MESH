@@ -24,7 +24,10 @@
 #include <signal.h>
 #include "logger.h"
 
-#define MESH_CONFIG_VERSION "Version 0.5"
+#define MESH_CONFIG_VERSION "Version 0.87"
+
+#define REMOTE_IP_ADDRESS	 "192.168.3.1"
+#define TEMP_IP_ADDRESS "192.168.3.2"
 
 #define streq(a,b) ((strlen(a) == strlen(b)) && (strncasecmp(a,b,strlen(b)) == 0))
 
@@ -34,4 +37,7 @@ void execute_cmds(char *cmds);
 bool is_mesh_cap_mode(char* mode);
 bool is_mesh_re_mode(char* mode);
 char* get_mesh_mode();
+
+FILE *  my_popen(const char *cmdstring, const char *type)  ;
+int  my_pclose(FILE *fp)  ;
 #endif

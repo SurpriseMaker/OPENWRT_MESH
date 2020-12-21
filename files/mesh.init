@@ -8,7 +8,7 @@ STOP=90
 
 USE_PROCD=1
 
-PROG=/usr/sbin/simcom
+PROG=/usr/sbin/meshserver
 
 start_service() {
 	procd_open_instance
@@ -18,7 +18,7 @@ start_service() {
 }
 
 stop_service() {
-	service_stop /usr/sbin/simcom
+	service_stop /usr/sbin/meshserver
 }
 
 restart() {

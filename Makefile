@@ -39,12 +39,10 @@ endef
 define Package/meshconfig/install
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_DIR) $(1)/etc/init.d
-	$(INSTALL_DIR) $(1)/root
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/meshserver $(1)/usr/sbin/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/meshconfig $(1)/usr/sbin/
 	$(INSTALL_BIN) ./files/mesh.init $(1)/etc/init.d/mesh
-	$(INSTALL_BIN) ./files/cap.sh $(1)/root/cap.sh
-	$(INSTALL_BIN) ./files/re.sh $(1)/root/re.sh
+	$(INSTALL_BIN) ./files/topology.sh $(1)/usr/sbin/topo
 endef
 
 $(eval $(call BuildPackage,meshconfig))

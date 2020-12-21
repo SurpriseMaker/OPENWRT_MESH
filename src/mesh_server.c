@@ -7,8 +7,6 @@ Description: This file implements the mesh server to simulate auto mesh config.
 
 Author: Mr.Tsao Bo
 
-Version: 0.3
-
 Date: 2020-10-29
 
 *****************************************************************************/
