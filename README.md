@@ -1,34 +1,67 @@
 # OPENWRT_MESH
-实现了OPENWRT下WIFISON自组网，带一个server用于接收远程命令，将设备连接到现有WIFISON网络中。
+本方案是基于OPENWRT的WIFISON自组网控制指令。
+支持设置UE角色（CAP/RE/Normal）、查看连接状态、搜索新设备、设置UE SSID和密码、
+通过TCP连接远程控制设备组网、查看拓扑信息等。
 
-指令：meshconfig
+## 指令一览：
+### 指令名称：
+meshconfig
 
-options:
+### 指令选项:
 
-capmode			--设置device作为WIFISON的CAP角色
+#### capmode		
+设置device作为WIFISON的CAP角色
 
-remode			--设置device作为WIFISON的RE角色
+#### remode			
+设置device作为WIFISON的RE角色
 
-getmode			--获取device当前角色(CAP/RE/Nomal)
+#### rn
+回复到normal状态
 
-showlink		-- 显示ath当前连接状态
+#### getmode			
+获取device当前角色(CAP/RE/Nomal)
 
-scan			--搜索并发现新设备
+#### showlink		
+显示ath当前连接状态
 
-setssid			--设置本机SSID
+#### scan			
+搜索并发现新设备
 
-setpwd			--设置本机密码
+#### setssid			
+设置本机SSID
 
-rcre			--远程控制，通过TCP连接将新设备设置作为RE
+#### setpwd			
+设置本机密码
 
-e.g. rcre <bssid> <ssid> [password]
+#### rcre			
+远程控制，通过TCP连接将新设备设置作为RE
+
+举例：
+rcre <bssid> <ssid> [password]
 
 Remote config RE via TCP steps:（远程控制步骤）
-1. CAP set as STA mode to connect remote device
-2. CAP build TCP connection to remote device
-3. CAP send control message to remote device
-4. Remote device receive and execute control command,respond
-5. CAP receives response message and reset itself as CAP mode.
+1. CAP作为STA连接到远端设备
+2. CAP与远端设备建立TCP连接
+3. CAP发送控制命令
+4. 远端设备接收并执行命令后返回
+5. CAP接收返回信息，将自己回退到CAP模式
+
+#### gettopo
+获取拓扑信息
+
+### 用法：
+系统调用，可ssh连接路由器后输入meshconfig，也可以在应用中调用。
+
+
+### 服务名称
+meshserver
+
+### 用途：
+作为远程控制的服务端，用于接收和执行远程控制指令。
+
+### 用法：
+开机自启动
+
 
 
 
