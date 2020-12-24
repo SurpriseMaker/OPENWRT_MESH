@@ -103,7 +103,7 @@ meshconfig/
       |——mesh_utils.h
       
       |——server_thread.c    S端子线程，接收并执行指令，返回结果
-
+|——makefile
 
 ## 设计概述：
 ### 框架
