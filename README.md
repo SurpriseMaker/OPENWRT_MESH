@@ -63,9 +63,36 @@ meshserver
 开机自启动
 
 
+## 文件目录
+meshconfig/
+|——files/
+      |——mesh.init  server初始化
+      |——topology.sh  拓扑信息查询脚本
+|——src/
+      |——logger.c   日志记录
+      |——logger.h   
+      |——Makefile
+      |——mesh_client.c    远程通信的C端，发送控制指令，接收反馈
+      |——mesh_config.h
+      |——mesh_config_details.c      负责指令具体执行
+      |——mesh_config_details.h
+      |——mesh_config_handle_command.c   负责指令解析
+      |——mesh_config_main.c   主函数，负责指令识别与分发
+      |——mesh_scan.c    负责搜索设备
+      |——mesh_server.c  远程通信的S端，开辟单独线程
+      |——mesh_server.h
+      |——mesh_utils.c   通用API
+      |——mesh_utils.h
+      |——server_thread.c    S端子线程，接收并执行指令，返回结果
 
 
-更新日期：2020-11-26
+## 设计概述：
+### 框架
+![Image text](https://github.com/SurpriseMaker/OPENWRT_MESH/blob/main/pics/wifison%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84.PNG)
+
+
+
+更新日期：2020-12-24
 作者：GentlemanTsao
 
 [WIFISON]路由器自组网控制指令开发使用手册
