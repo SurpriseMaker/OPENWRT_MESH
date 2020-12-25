@@ -68,40 +68,25 @@ meshconfig/
 
 |——files
 
-      |——mesh.init  server初始化
-      
+      |——mesh.init  server初始化    
       |——topology.sh  拓扑信息查询脚本
       
 |——src
 
       |——logger.c   日志记录
-      
       |——logger.h   
-      
       |——Makefile
-      
       |——mesh_client.c    远程通信的C端，发送控制指令，接收反馈
-      
       |——mesh_config.h
-      
       |——mesh_config_details.c      负责指令具体执行
-      
       |——mesh_config_details.h
-      
       |——mesh_config_handle_command.c   负责指令解析
-      
       |——mesh_config_main.c   主函数，负责指令识别与分发
-      
       |——mesh_scan.c    负责搜索设备
-      
       |——mesh_server.c  远程通信的S端，开辟单独线程
-      
       |——mesh_server.h
-      
       |——mesh_utils.c   通用API
-      
       |——mesh_utils.h
-      
       |——server_thread.c    S端子线程，接收并执行指令，返回结果
 |——makefile
 
@@ -119,9 +104,12 @@ C/S交互...
 
 ### 极简代码
 7行代码实现主函数（对比OPENWRT原生，例如wlanconfig主函数100+行，同样的效果）
+
 主函数：
+
 int main(int argc, char *argv[])
 {
+
 	const char *cmd;
 	int status = 0;
 	int (*handle_command) (int argc, char *argv[]);
@@ -140,7 +128,9 @@ int main(int argc, char *argv[])
 
 ### 结构化组织
 将指令名、指令说明、实现接口组织到一起，便于修改和查询。
+
 const mesh_cmd_struct mesh_cmd_config[MESH_CMD_MAX] = {
+
 		{"capmode",	"Config as CAP. e.g. capmode <backhaul SSID>",	handle_command_set_cap_mode},
 		{"remode",	"Config as RE. e.g. remode <backhaul SSID>",	handle_command_set_re_mode},
 		{"getmode",	"Get mode(CAP/RE/Nomal)",	handle_command_get_mode},
