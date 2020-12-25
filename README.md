@@ -109,14 +109,75 @@ meshconfig/
 ### 框架
 ![Image text](https://github.com/SurpriseMaker/OPENWRT_MESH/blob/main/pics/wifison%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84.PNG)
 
+#### 清晰的分层结构
+指令识别分发；
+指令解析；
+执行；
+搜索；
+C/S交互...
+每一层实现单一职责，低耦合。
+
+### 极简代码
+7行代码实现主函数（对比OPENWRT原生，例如wlanconfig主函数100+行，同样的效果）
+主函数：
+int main(int argc, char *argv[])
+{
+	const char *cmd;
+	int status = 0;
+	int (*handle_command) (int argc, char *argv[]);
+
+	if(argc < 2){
+		return usg(argv);
+	}
+
+	cmd = argv[1];	
+	handle_command = get_handle_command_function(cmd);	
+
+	status = handle_command(argc, argv);
+
+       return status;	
+}
+
+### 结构化组织
+将指令名、指令说明、实现接口组织到一起，便于修改和查询。
+const mesh_cmd_struct mesh_cmd_config[MESH_CMD_MAX] = {
+		{"capmode",	"Config as CAP. e.g. capmode <backhaul SSID>",	handle_command_set_cap_mode},
+		{"remode",	"Config as RE. e.g. remode <backhaul SSID>",	handle_command_set_re_mode},
+		{"getmode",	"Get mode(CAP/RE/Nomal)",	handle_command_get_mode},
+		{"showlink",	"Show link status",	handle_command_show_link_status},
+		{"scan",		"Scan wireless",	handle_command_scan_wireless},
+		{"setssid",	"Set SSID, e.g. setssid <SSID>",	handle_command_set_SSID},
+		{"setpwd",	"Set Password, e.g. setpwd <password>",		handle_command_set_password},
+		{"rcre",		"Remote config RE. e.g.  rcre  <backhaul SSID><bssid><ssid>[password]",		handle_command_remote_config_re},
+		{"normalmode",		"Restore to normal mode.", 		handle_command_restore_to_normal_mode},
+		{"gettopo",	"Get topology",	handle_command_get_topology},
+		//Add new cmd above.
+};
+
+### 使用管道+shell实现telnet自动登录执行拓扑查询
+ip="127.0.0.1"
+port=7777
+
+inputfile=in 
+input1="td s2"
+input2="exit"
+
+rm -fr $inputfile    
+mknod $inputfile p  
+
+exec 8<>$inputfile 
+
+telnet $ip $port <&8 &
+sleep 1; echo $input1 >> $inputfile   
+echo $input2 >> $inputfile 
 
 
 更新日期：2020-12-24
 作者：GentlemanTsao
 
-[WIFISON]路由器自组网控制指令开发使用手册
+# [WIFISON]路由器自组网控制指令开发使用手册
 
-1.什么是WIFISON
+## 1.什么是WIFISON
 
 WIFISON全称Wi-Fi self-organizing network。
 
@@ -131,10 +192,10 @@ WIFISON全称Wi-Fi self-organizing network。
 自我防卫
 
 
-2.WIFISON的优势：
+## 2.WIFISON的优势：
 ![Image text](https://github.com/SurpriseMaker/OPENWRT_MESH/blob/main/pics/advantage.jpg)
 
-3.WIFISON组网示意图
+## 3.WIFISON组网示意图
 
 星型组网
 ![Image text](https://github.com/SurpriseMaker/OPENWRT_MESH/blob/main/pics/star1.jpg)
