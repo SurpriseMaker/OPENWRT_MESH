@@ -9,12 +9,11 @@ Date: 2020-11-25
 *****************************************************************************/
 #include"mesh_config.h"
 #include"mesh_server.h"
-
+#include "error_handle.h"
 
 int connect_to_remote_and_handle_resp(char* backhaul_ssid, char* ip_address)
 {
 	int sockfd,recv_len;
-	const int MAX_CONNECT_ATTEMPT_TIMES = 100;
 	int current_attempt_times = 0;
 
 	struct sockaddr_in client_addr;
@@ -26,7 +25,7 @@ int connect_to_remote_and_handle_resp(char* backhaul_ssid, char* ip_address)
 
 	if((sockfd = socket(PF_INET,SOCK_STREAM,0))==-1){
 		perror("fail to create socket");
-		return -1;
+		return ERROR_CREATE_SOCKET_FAILED;
 	}
 
 	printf("Socket is created successfully.\n");
@@ -39,7 +38,7 @@ int connect_to_remote_and_handle_resp(char* backhaul_ssid, char* ip_address)
 	if( bind(sockfd,(struct sockaddr*)&client_addr,sizeof(client_addr))){
         	printf("Bind Port Failed!\n"); 
 		close(sockfd);
-        	return -2;
+        	return ERROR_BIND_FAILED;
     	}
 
 	printf("Bind successfully.\n");
@@ -55,11 +54,11 @@ int connect_to_remote_and_handle_resp(char* backhaul_ssid, char* ip_address)
 			if(current_attempt_times > MAX_CONNECT_ATTEMPT_TIMES){
         			printf("Can Not Connect To Remote Device!,target ip =%s\n",ip_address);
 				close(sockfd);
-        			return -3;
+        			return ERROR_CONNECT_REMOTE_FAILED;
 			}
-			sleep(2);
+			sleep(1);
     		}else{
-    			printf("Total connect time: %d s\n", current_attempt_times * 2);
+    			printf("Total connect time: %d s\n", current_attempt_times );
     			break;
     		}
 	}
@@ -70,12 +69,12 @@ int connect_to_remote_and_handle_resp(char* backhaul_ssid, char* ip_address)
 	send_operation.msg_type = MESH_MSG_TYPE_REMOTE_SET_RE_REQ;
 	strcat(send_operation.data,backhaul_ssid);
 
-	printf("send: operation.msg_type=%d, operation.data=%s.\n",send_operation.msg_type,send_operation.data);
+	printf("send: operation.msg_type=%d, operation.data=%s\n",send_operation.msg_type,send_operation.data);
 	
 	if(send(sockfd,&send_operation,sizeof(send_operation),0)<0){
 		printf("send failed !Annihilation commencing.\n");
 		close(sockfd);
-        	return -4;
+        	return ERROR_SEND_FAILED;
 	}
 
 	printf("Synchronizing.\n");
@@ -115,23 +114,30 @@ int connect_to_remote_and_handle_resp(char* backhaul_ssid, char* ip_address)
 
 int remote_config_re(char* backhaul_ssid,remote_device_info_struct* remote_info)
 {
-	int result;
+	int result =0;
+	int recv_len = 0;
+	char* error_string;
 	
 	config_as_repeater_and_restart(remote_info->ip_address,
 									remote_info->bssid,
 									remote_info->ssid,
 									remote_info->password);
 
-	result = connect_to_remote_and_handle_resp(backhaul_ssid,remote_info->ip_address);
+	recv_len = connect_to_remote_and_handle_resp(backhaul_ssid,remote_info->ip_address);
 
 	config_restore_from_repeater(remote_info->ip_address);
 	
-	printf("result = %d\n",result);
+	printf("recv_len = %d\n",recv_len);
 	
-	if(result > 0){
+	if(recv_len > 0){
 		printf("Successfully command remote device. 0(n_n)0\n");
+		result = 0;
 	}else{
 		printf("Failed to command remote device. :-(\n");
+		
+		result = recv_len;
+		error_string = error_code_to_string(result);
+		printf("ERROR:%s\n",error_string);
 	}
-	return 0;
+	return result;
 }

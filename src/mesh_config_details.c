@@ -21,8 +21,6 @@ Date: 2020-10-29
 
 void config_as_cap_mode(char* backhaul_ssid)
 {
-	char cmd[64]; 
-
 	execute_cmds("uci set wireless.wifi0.repacd_auto_create_vaps=0");
 	execute_cmds("uci set wireless.wifi1.repacd_auto_create_vaps=0");
 
@@ -35,10 +33,7 @@ void config_as_cap_mode(char* backhaul_ssid)
 	execute_cmds("uci set wireless.back1.network=lan");
 	execute_cmds("uci set wireless.back1.mode=ap");
 	execute_cmds("uci set wireless.back1.wds=1");
-	memset(cmd,0,sizeof(cmd));
-	strcat(cmd,"uci set wireless.back1.ssid=");
-	strcat(cmd,backhaul_ssid);
-	execute_cmds(cmd);
+	execute_cmds_2("uci set wireless.back1.ssid=",backhaul_ssid);
 	execute_cmds("uci set wireless.back1.device=wifi0");
 	execute_cmds("uci set wireless.back1.wsplcd_unmanaged=1");
 	execute_cmds("uci set wireless.back1.repacd_security_unmanaged=1");
@@ -52,10 +47,7 @@ void config_as_cap_mode(char* backhaul_ssid)
 	execute_cmds("uci set wireless.back2.network=lan");
 	execute_cmds("uci set wireless.back2.mode=ap");
 	execute_cmds("uci set wireless.back2.wds=1");
-	memset(cmd,0,sizeof(cmd));
-	strcat(cmd,"uci set wireless.back2.ssid=");
-	strcat(cmd,backhaul_ssid);
-	execute_cmds(cmd);
+	execute_cmds_2("uci set wireless.back2.ssid=",backhaul_ssid);
 	execute_cmds("uci set wireless.back2.device=wifi1");
 	execute_cmds("uci set wireless.back2.wsplcd_unmanaged=1");
 	execute_cmds("uci set wireless.back2.repacd_security_unmanaged=1");
@@ -89,10 +81,9 @@ void config_as_cap_mode_and_restart(char* backhaul_ssid){
 	config_as_cap_mode(backhaul_ssid);
 	
 	execute_cmds("/etc/init.d/network restart");
-	//TODO: sleep is not an appropriate way.
-	sleep(15);
+
 	execute_cmds("/etc/init.d/repacd start");
-	sleep(1);
+
 }
 
 void restore_from_cap_mode()
@@ -125,10 +116,8 @@ void restore_from_cap_mode_and_restart(){
 	restore_from_cap_mode();
 
 	execute_cmds("/etc/init.d/network restart");
-	//TODO: sleep is not an appropriate way.
-	sleep(15);
+
 	execute_cmds("/etc/init.d/repacd start");
-	sleep(1);
 }
 
 static void mesh_cap_delete_old_settings()
@@ -147,8 +136,6 @@ static void mesh_cap_delete_old_settings()
 
 void config_as_re_mode(char* backhaul_ssid)
 {
-	char cmd[64]; 
-	
 	execute_cmds("uci set wireless.wifi0.repacd_auto_create_vaps=0");
 	execute_cmds("uci set wireless.wifi1.repacd_auto_create_vaps=0");
 
@@ -160,10 +147,7 @@ void config_as_re_mode(char* backhaul_ssid)
 	execute_cmds("uci set wireless.back1.network=lan");
 	execute_cmds("uci set wireless.back1.mode=sta");
 	execute_cmds("uci set wireless.back1.wds=1");
-	memset(cmd,0,sizeof(cmd));
-	strcat(cmd,"uci set wireless.back1.ssid=");
-	strcat(cmd,backhaul_ssid);
-	execute_cmds(cmd);
+	execute_cmds_2("uci set wireless.back1.ssid=", backhaul_ssid);
 	execute_cmds("uci set wireless.back1.device=wifi0");
 	execute_cmds("uci set wireless.back1.wsplcd_unmanaged=1");
 	execute_cmds("uci set wireless.back1.repacd_security_unmanaged=1");
@@ -175,10 +159,7 @@ void config_as_re_mode(char* backhaul_ssid)
 	execute_cmds("uci set wireless.back2.network=lan");
 	execute_cmds("uci set wireless.back2.mode=sta");
 	execute_cmds("uci set wireless.back2.wds=1");
-	memset(cmd,0,sizeof(cmd));
-	strcat(cmd,"uci set wireless.back2.ssid=");
-	strcat(cmd,backhaul_ssid);
-	execute_cmds(cmd);
+	execute_cmds_2("uci set wireless.back2.ssid=", backhaul_ssid);
 	execute_cmds("uci set wireless.back2.device=wifi1");
 	execute_cmds("uci set wireless.back2.wsplcd_unmanaged=1");
 	execute_cmds("uci set wireless.back2.repacd_security_unmanaged=1");
@@ -190,10 +171,7 @@ void config_as_re_mode(char* backhaul_ssid)
 	execute_cmds("uci set wireless.back3.network=lan");
 	execute_cmds("uci set wireless.back3.mode=ap");
 	execute_cmds("uci set wireless.back3.wds=1");
-	memset(cmd,0,sizeof(cmd));
-	strcat(cmd,"uci set wireless.back3.ssid=");
-	strcat(cmd,backhaul_ssid);
-	execute_cmds(cmd);
+	execute_cmds_2("uci set wireless.back3.ssid=", backhaul_ssid);
 	execute_cmds("uci set wireless.back3.device=wifi0");
 	execute_cmds("uci set wireless.back3.wsplcd_unmanaged=1");
 	execute_cmds("uci set wireless.back3.repacd_security_unmanaged=1");
@@ -206,10 +184,7 @@ void config_as_re_mode(char* backhaul_ssid)
 	execute_cmds("uci set wireless.back4.network=lan");
 	execute_cmds("uci set wireless.back4.mode=ap");
 	execute_cmds("uci set wireless.back4.wds=1");
-	memset(cmd,0,sizeof(cmd));
-	strcat(cmd,"uci set wireless.back4.ssid=");
-	strcat(cmd,backhaul_ssid);
-	execute_cmds(cmd);
+	execute_cmds_2("uci set wireless.back4.ssid=", backhaul_ssid);
 	execute_cmds("uci set wireless.back4.device=wifi1");
 	execute_cmds("uci set wireless.back4.wsplcd_unmanaged=1");
 	execute_cmds("uci set wireless.back4.repacd_security_unmanaged=1");
@@ -255,11 +230,8 @@ void config_as_re_mode_and_restart(char* backhaul_ssid)
 	config_as_re_mode(backhaul_ssid);
 
 	execute_cmds("/etc/init.d/network restart");	
-	//TODO: sleep is not an appropriate way.
-	sleep(20);
 	
 	execute_cmds("/etc/init.d/repacd start");
-	sleep(1);
 }
 
 void restore_from_re_mode(){
@@ -315,11 +287,8 @@ void restore_from_re_mode_and_restart(){
 	restore_from_re_mode();
 
 	execute_cmds("/etc/init.d/network restart");	
-	//TODO: sleep is not an appropriate way.
-	sleep(20);
 	
 	execute_cmds("/etc/init.d/repacd start");
-	sleep(1);
 }
 
 void mesh_re_delete_old_settings()
@@ -377,18 +346,8 @@ int check_and_set_re_mode(char* backhaul_ssid)
 
 int config_as_repeater_and_restart(char* ip_address,char* bssid,char* ssid,char* password)
 {
-	char cmd[64]; 
-
-	memset(cmd,0,sizeof(cmd));
-	strcat(cmd,"uci set network.lan.ipaddr=");
-	strcat(cmd,TEMP_IP_ADDRESS);
-	execute_cmds(cmd);
-	
-	memset(cmd,0,sizeof(cmd));
-	strcat(cmd,"uci set network.lan.gateway=");
-	strcat(cmd,ip_address);
-	execute_cmds(cmd);
-	
+	execute_cmds_2("uci set network.lan.ipaddr=", TEMP_IP_ADDRESS);
+	execute_cmds_2("uci set network.lan.gateway=", ip_address);	
 	execute_cmds("uci set network.lan.stp=1");
 	execute_cmds("uci del network.wwan");
 	execute_cmds("uci add network interface");
@@ -405,34 +364,18 @@ int config_as_repeater_and_restart(char* ip_address,char* bssid,char* ssid,char*
 	execute_cmds("uci set wireless.link.mode=sta");
 	execute_cmds("uci set wireless.link.encryption=psk2+ccmp");
 	execute_cmds("uci set wireless.link.wds=1");	
-	
-	memset(cmd,0,sizeof(cmd));
-	strcat(cmd,"uci set wireless.link.bssid=");
-	strcat(cmd,bssid);
-	execute_cmds(cmd);
-	
-	memset(cmd,0,sizeof(cmd));
-	strcat(cmd,"uci set wireless.link.ssid=");
-	strcat(cmd,ssid);
-	execute_cmds(cmd);
+	execute_cmds_2("uci set wireless.link.bssid=", bssid);
+	execute_cmds_2("uci set wireless.link.ssid=", ssid);
 	
 	if(NULL == password){
 		execute_cmds("uci set wireless.link.encryption=none");
 	}else{
 		execute_cmds("uci set wireless.link.encryption=psk-mixed+tkip+aes");
-		memset(cmd,0,sizeof(cmd));
-		strcat(cmd,"uci set wireless.link.key=");
-		strcat(cmd,password);
-		execute_cmds(cmd);
+		execute_cmds_2("uci set wireless.link.key=", password);
 	}
 	execute_cmds("uci commit wireless");
 
-
-	memset(cmd,0,sizeof(cmd));
-	strcat(cmd,"uci add_list dhcp.@dnsmasq[0].server=");
-	strcat(cmd,ip_address);
-	execute_cmds(cmd);
-	
+	execute_cmds_2("uci add_list dhcp.@dnsmasq[0].server=", ip_address);	
 	execute_cmds("uci set dhcp.lan.ignore=1");
 	execute_cmds("uci set dhcp.lan.ra_management=1");
 	execute_cmds("uci commit dhcp");
@@ -449,12 +392,7 @@ int config_as_repeater_and_restart(char* ip_address,char* bssid,char* ssid,char*
 
 int config_restore_from_repeater(char* ip_address)
 {
-	char cmd[64]; 
-	
-	memset(cmd,0,sizeof(cmd));
-	strcat(cmd,"uci set network.lan.ipaddr=");
-	strcat(cmd,ip_address);
-	execute_cmds(cmd);
+	execute_cmds_2("uci set network.lan.ipaddr=", ip_address);
 	execute_cmds("uci del network.lan.gateway");
 	execute_cmds("uci del network.lan.stp");
 	execute_cmds("uci del network.wwan");
@@ -463,10 +401,7 @@ int config_restore_from_repeater(char* ip_address)
 	execute_cmds("uci del wireless.link");
 	execute_cmds("uci commit wireless");
 
-	memset(cmd,0,sizeof(cmd));
-	strcat(cmd,"uci del_list dhcp.@dnsmasq[0].server=");
-	strcat(cmd,ip_address);
-	execute_cmds(cmd);
+	execute_cmds_2("uci del_list dhcp.@dnsmasq[0].server=", ip_address);
 	execute_cmds("uci del dhcp.lan.ignore");
 	execute_cmds("uci del dhcp.lan.ra_management");
 	execute_cmds("uci commit dhcp");
@@ -475,5 +410,101 @@ int config_restore_from_repeater(char* ip_address)
 	execute_cmds("uci commit firewall");
 
 	execute_cmds("/etc/init.d/network restart");
+	return 0;
+}
+
+int config_as_cap_wps_mode(void){
+	execute_cmds("uci set wireless.qcawifi=qcawifi");
+	execute_cmds("uci set wireless.qcawifi.wps_pbc_extender_enhance=1");
+	execute_cmds("uci set wireless.qcawifi.wps_pbc_overwrite_ap_settings_all=1");
+	execute_cmds("uci set wireless.qcawifi.wps_pbc_overwrite_sta_settings_all=1");
+	execute_cmds("uci commit wireless");
+
+	execute_cmds("uci set lbd.@config[0].Enable=1");
+	execute_cmds("uci set lbd.StaDB.MarkAdvClientAsDualBand=1");
+	execute_cmds("uci set lbd.SteerExec_Adv.StartInBTMActiveState=1");
+	execute_cmds("uci set lbd.config.InactDetectionFromTx=1");
+	execute_cmds("uci commit lbd");
+
+	execute_cmds("uci set hyd.@config[0].Enable=1");
+	execute_cmds("uci set hyd.Topology.ENABLE_NOTIFICATION_UNICAST=1");
+	execute_cmds("uci set hyd.Topology.PERIODIC_QUERY_INTERVAL=15");
+	execute_cmds("uci set hyd.IEEE1905Settings.AvoidDupRenew=1 ");
+	execute_cmds("uci set hyd.IEEE1905Settings.AvoidDupTopologyNotification=1 ");
+	execute_cmds("uci commit hyd");
+
+	execute_cmds("uci set repacd.repacd.Enable=1");
+	execute_cmds("uci set repacd.repacd.GatewayConnectedMode=CAP");
+	execute_cmds("uci set repacd.repacd.ConfigREMode=son");
+	execute_cmds("uci set repacd.repacd.DefaultREMode=son");
+	execute_cmds("uci set repacd.WiFiLink.DaisyChain=1");
+	execute_cmds("uci commit repacd");
+
+	execute_cmds("uci set wsplcd.config.HyFiSecurity=1");
+	execute_cmds("uci commit wsplcd");
+
+	return 0;
+}
+
+int config_as_cap_wps_mode_and_restart(void){
+	config_as_cap_wps_mode();
+	execute_cmds("/etc/init.d/repacd start");
+	return 0;
+}
+
+int config_as_re_wps_mode(void){
+	execute_cmds("uci delete network.wan");
+	execute_cmds("uci delete network.wan6");
+	execute_cmds("uci set network.lan.proto=dhcp");
+	execute_cmds("uci set network.lan.ifname='eth1 eth2 eth3'");
+	execute_cmds("uci commit network");
+
+	execute_cmds("uci set dhcp.lan.ignore=1");
+	execute_cmds("uci commit dhcp");
+
+	execute_cmds("uci set wireless.qcawifi=qcawifi");
+	execute_cmds("uci set wireless.qcawifi.wps_pbc_extender_enhance=1");
+	execute_cmds("uci set wireless.qcawifi.wps_pbc_overwrite_ap_settings_all=1");
+	execute_cmds("uci set wireless.qcawifi.wps_pbc_overwrite_sta_settings_all=1");
+	execute_cmds("uci set wireless.wifi0.ul_hyst=10");
+	execute_cmds("uci commit wireless");
+
+	execute_cmds("uci set lbd.@config[0].Enable=1");
+	execute_cmds("uci set lbd.StaDB.MarkAdvClientAsDualBand=1");
+	execute_cmds("uci set lbd.SteerExec_Adv.StartInBTMActiveState=1");
+	execute_cmds("uci set lbd.config.InactDetectionFromTx=1");
+	execute_cmds("uci commit lbd");
+
+
+	execute_cmds("uci set repacd.repacd.DefaultREMode=son");
+	execute_cmds("uci set repacd.WiFiLink.ManageVAPInd=1");
+	execute_cmds("uci set repacd.repacd.Enable=1");
+	execute_cmds("uci set repacd.repacd.ConfigREMode='son'");
+	execute_cmds("uci set repacd.WiFiLink.DaisyChain=1");
+	execute_cmds("uci set repacd.WiFiLink.5GBackhaulEvalTimeShort='180' ");
+	execute_cmds("uci set repacd.WiFiLink.5GBackhaulEvalTimeLong='300' ");
+	execute_cmds("uci set repacd.WiFiLink.2GBackhaulEvalTime='300'");
+	execute_cmds("uci commit repacd");
+
+	execute_cmds("uci set hyd.@config[0].Enable=1");
+	execute_cmds("uci set hyd.config.Mode='HYCLIENT'");
+	execute_cmds("uci set hyd.Topology.ENABLE_NOTIFICATION_UNICAST=1");
+	execute_cmds("uci set hyd.Topology.PERIODIC_QUERY_INTERVAL=15");
+	execute_cmds("uci set hyd.IEEE1905Settings.AvoidDupRenew=1 ");
+	execute_cmds("uci set hyd.IEEE1905Settings.AvoidDupTopologyNotification=1 ");
+	execute_cmds("uci commit hyd");
+
+	execute_cmds("uci set wsplcd.config.HyFiSecurity=1");
+	execute_cmds("uci commit wsplcd");
+
+	return 0;
+}
+
+int config_as_re_wps_mode_and_restart(void){
+	config_as_re_wps_mode();
+
+	execute_cmds("/etc/init.d/network restart");
+	execute_cmds("/etc/init.d/repacd start");
+
 	return 0;
 }

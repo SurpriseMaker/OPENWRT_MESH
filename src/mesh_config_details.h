@@ -11,4 +11,6 @@ void restore_from_cap_mode_and_restart();
 void restore_from_re_mode_and_restart();
 int config_as_repeater_and_restart(char* ip_address,char* bssid,char* ssid,char* password);
 int config_restore_from_repeater(char* ip_address);
+int config_as_cap_wps_mode_and_restart(void);
+int config_as_re_wps_mode_and_restart(void);
 #endif

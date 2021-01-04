@@ -16,7 +16,8 @@ enum MESH_CMD{
 	MESH_CMD_REMOTE_CONFIG_RE,
 	MESH_CMD_RESTORE_TO_NORMAL_MODE,
 	MESH_CMD_GET_TOPOLOGY,
-	
+	MESH_CMD_SET_CAP_WPS_MODE,
+	MESH_CMD_SET_RE_WPS_MODE,
 	//ADD new cmd above
 	MESH_CMD_MAX	
 };
@@ -59,4 +60,6 @@ int remote_config_re(char* backhaul_ssid,remote_device_info_struct* remote_info)
 char* mesh_scan(const char *cmd);
 int simcom_mesh_list(const char *cmd);
 char* get_topology(void);
+int handle_command_set_cap_wps_mode(int argc, char *argv[]);
+int handle_command_set_re_wps_mode(int argc, char *argv[]);
 #endif

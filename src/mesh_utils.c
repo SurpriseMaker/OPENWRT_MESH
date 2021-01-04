@@ -36,33 +36,54 @@ char* my_system(const char *cmd)
 	static char cmd_result[25600] = {0};
 	char buf[32] = {0};
 	FILE *fp = NULL;
+	int readn = 0;
 
 	memset(cmd_result,0,sizeof(cmd_result));
 	if( (fp = popen(cmd, "r")) == NULL )
 	{
 		printf("popen error!\n");
 	}else{
-		while (fgets(buf, sizeof(buf), fp))
-		{
+		while(!feof(fp)){
+			readn = fread(buf, sizeof(char), sizeof(buf), fp);
+			if(readn == 0){
+				if(errno == EINTR){
+					printf("EINTR Detected \n");
+					continue;
+				}else{
+					break;
+				}
+			}
+
 			printf(buf);
 			strcat(cmd_result, buf);
+			
 		}
 
 		pclose(fp);
 	}
-	
+
+	printf("Finished cmd: %s\n", cmd);
 	return cmd_result;
 }
 
 
-void execute_cmds(char *cmds)
+void execute_cmds(char *arg)
 {
-	char shell_cmd[256] = {'\0'};
-	snprintf(shell_cmd, sizeof(shell_cmd), "%s", cmds);
-	my_system(shell_cmd);
+	my_system(arg);
 }
 
-bool is_mesh_cap_mode(char* mode){
+void execute_cmds_2(char *arg1, char *arg2)
+{
+	char target_cmd[128]; 
+	memset(target_cmd,0,sizeof(target_cmd));
+	strcat(target_cmd, arg1);
+	strcat(target_cmd, arg2);
+	
+	my_system(target_cmd);
+}
+	
+bool is_mesh_cap_mode(char* mode)
+{
 	bool ret = false;
 	
 	if (! strncmp(mode,"ap",2)){
@@ -72,7 +93,8 @@ bool is_mesh_cap_mode(char* mode){
 	return ret;
 }
 
-bool is_mesh_re_mode(char* mode){
+bool is_mesh_re_mode(char* mode)
+{
 	bool ret = false;
 	
 	if (! strncmp(mode,"sta",3)){
@@ -83,7 +105,7 @@ bool is_mesh_re_mode(char* mode){
 }
 
 char* get_mesh_mode(){
-	return my_system("uci get wireless.back1.mode 2> /dev/null");
+	return my_system("uci get wireless.back1.mode");
 }
 
 

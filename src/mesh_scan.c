@@ -1,7 +1,5 @@
 /*****************************************************************************
 
-Copyright: 2011-2020, SIMCOM. Co., Ltd.
-
 Description: This file implements mesh devices scan, topology query....
 
 Author: Mr.Tsao Bo
@@ -54,6 +52,7 @@ char* mesh_scan(const char *cmd)
 	
 	return scan_result;
 }
+
 
 static void parse_list_buffer(int *index,char *buffer)
 {
@@ -131,7 +130,6 @@ char* get_topology(void){
 	FILE *fp = NULL;
 	static char result[16384] = {0};
 	char* filter_oneline_result;
-	char *token = NULL;
 
 	memset(result,0,sizeof(result));
 

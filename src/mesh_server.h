@@ -3,6 +3,7 @@
 #define MESH_SERVER_H
 
 #define MESH_PROT 9658
+#define MAX_CONNECT_ATTEMPT_TIMES 30
 
 #define MESSAGE_DATA_BYTES 256
 #define MESSAGE_DATA_CONFIG_RE_REQ "Remote config RE"
@@ -22,12 +23,6 @@ typedef struct {
 	char verifydata[MESSAGE_DATA_BYTES];
 } struct_mesh_msg;
 
-typedef struct {
-	char* ip_address;
-	char* bssid;
-	char* ssid;
-	char* password;
-}struct_remote_device_info;
 	
 void * mesh_server_run(void *param);
 void server_loop();

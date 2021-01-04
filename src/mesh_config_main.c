@@ -1,6 +1,6 @@
 
 
-/*****************************************************************************
+/***************************************************************************************
 
 Description: This file implements the main entry of  mesh configuration commands as well as
 the framework of meshconfig commands. These commands is for the use of wifison config.		
@@ -9,14 +9,14 @@ Author: Mr.Tsao Bo
 
 Date: 2020-11-26
 
-*****************************************************************************/
+***************************************************************************************/
 
 #include"mesh_config.h"
 
 /*To be more explicit, manage all the meshconfig commands in this array.*/
 const mesh_cmd_struct mesh_cmd_config[MESH_CMD_MAX] = {
-		{"capmode",	"Config as CAP. e.g. capmode <backhaul SSID>",	handle_command_set_cap_mode},
-		{"remode",	"Config as RE. e.g. remode <backhaul SSID>",	handle_command_set_re_mode},
+		{"capmode",	"Config as CAP. e.g. capmode [backhaul SSID]",	handle_command_set_cap_mode},
+		{"remode",	"Config as RE. e.g. remode [backhaul SSID]",	handle_command_set_re_mode},
 		{"getmode",	"Get mode(CAP/RE/Nomal)",	handle_command_get_mode},
 		{"showlink",	"Show link status",	handle_command_show_link_status},
 		{"scan",		"Scan wireless",	handle_command_scan_wireless},
@@ -25,6 +25,8 @@ const mesh_cmd_struct mesh_cmd_config[MESH_CMD_MAX] = {
 		{"rcre",		"Remote config RE. e.g.  rcre  <backhaul SSID><bssid><ssid>[password]",		handle_command_remote_config_re},
 		{"normalmode",		"Restore to normal mode.", 		handle_command_restore_to_normal_mode},
 		{"gettopo",	"Get topology",	handle_command_get_topology},
+		{"capwps",	"Config as CAP and need press WPS button to connect.",		handle_command_set_cap_wps_mode},
+		{"rewps",		"Config as RE and need press WPS button to connect.",	handle_command_set_re_wps_mode},
 		//Add new cmd above.
 };
 
@@ -44,7 +46,9 @@ static int usg(char **argv)
 	printf("Usage: %s [options]\n", argv[0]);
 	
 	for (int i = 0; i < MESH_CMD_MAX; i++){
-		printf("%s  		%s\n",mesh_cmd_config[i].cmd_name ,mesh_cmd_config[i].cmd_description);
+		printf("%s  		%s\n",
+			mesh_cmd_config[i].cmd_name ,
+			mesh_cmd_config[i].cmd_description);
 	}
 
 	printf("-----------------------------------------------------------------\n");
@@ -55,6 +59,7 @@ handle_func_ptr get_handle_command_function(const char * cmd){
 	handle_func_ptr handle_command;
 	
 	handle_command = do_nothing;
+	
 	for(int i = 0; i < MESH_CMD_MAX; i++){
 		mesh_cmd_struct cmd_item = mesh_cmd_config[i];
 		
