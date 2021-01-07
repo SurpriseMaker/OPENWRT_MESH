@@ -75,8 +75,8 @@ void server_loop()
 		memset(&recv_operation,0,sizeof(recv_operation));
 		recv_len = recvfrom(client_sock,&recv_operation,sizeof(recv_operation),0,(struct sockaddr*)&client_addr,&peerlen);
 			
-		printf("Rcv msg :recv_len=%d, data=%s\n",recv_len,recv_operation.data);
-		dbg_time("Rcv msg :recv_len=%d, data=%s\n",recv_len,recv_operation.data);
+		printf("Rcv msg :recv_len=%d, msg_type=%d, data=%s\n",recv_len,recv_operation.msg_type,recv_operation.data);
+		dbg_time("Rcv msg :recv_len=%d,msg_type=%d, data=%s\n",recv_len, recv_operation.msg_type, recv_operation.data);
 
 		memset(&send_operation,0,sizeof(send_operation));
 		switch(recv_operation.msg_type){
@@ -90,8 +90,20 @@ void server_loop()
 				sendto(client_sock,&send_operation,sizeof(send_operation),0,(struct sockaddr *)&server_addr,peerlen);
 				printf("Processed.\n send report  to CAP, data = %s\n",send_operation.data);
 			
-				check_and_set_re_mode(backhaul_ssid);
+				check_and_set_mode_re_auto(backhaul_ssid);
 				break;
+				
+			case MESH_MSG_TYPE_REMOTE_RESTORE_RE_REQ:
+				send_operation.msg_type = MESH_MSG_TYPE_REMOTE_RESTORE_RE_RESP;
+				strcat(send_operation.data,MESSAGE_DATA_CONFIG_RE_RESP_PASS);
+				strcat(send_operation.verifydata,recv_operation.data);
+
+				sendto(client_sock,&send_operation,sizeof(send_operation),0,(struct sockaddr *)&server_addr,peerlen);
+				printf("Processed.\n send report  to CAP, data = %s\n",send_operation.data);
+
+				restore_from_re_mode_and_restart();
+				break;
+				
 			default:
 
 				send_operation.msg_type = MESH_MSG_TYPE_REMOTE_SET_RE_RESP;

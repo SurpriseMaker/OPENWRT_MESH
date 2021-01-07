@@ -11,7 +11,24 @@ Date: 2020-11-25
 #include"mesh_server.h"
 #include "error_handle.h"
 
-int connect_to_remote_and_handle_resp(char* backhaul_ssid, char* ip_address)
+int count_and_validate_connect_failure(){
+	static int current_attempt_times = 0;
+
+	current_attempt_times++;
+	if(current_attempt_times > MAX_CONNECT_ATTEMPT_TIMES){
+		return 1;
+	}else{
+		return 0;
+	}
+}
+
+void connect_alarm_handle(){
+	printf("Connect blocked more than 2 seconds!!! Please check connect parameters!\n");
+	count_and_validate_connect_failure();
+	count_and_validate_connect_failure();
+}
+
+int connect_to_remote_and_handle_resp(int msg_type, remote_device_info_struct* remote_info)
 {
 	int sockfd,recv_len;
 	int current_attempt_times = 0;
@@ -22,6 +39,7 @@ int connect_to_remote_and_handle_resp(char* backhaul_ssid, char* ip_address)
 	struct timeval tv_out;
 	struct_mesh_msg send_operation={0};
 	struct_mesh_msg recv_operation={0};
+	int connect_result = -10;
 
 	if((sockfd = socket(PF_INET,SOCK_STREAM,0))==-1){
 		perror("fail to create socket");
@@ -46,19 +64,23 @@ int connect_to_remote_and_handle_resp(char* backhaul_ssid, char* ip_address)
 	memset(&server_addr,0,sizeof(server_addr));
 	server_addr.sin_family=AF_INET;
 	server_addr.sin_port=htons(MESH_PROT);
-	server_addr.sin_addr.s_addr=inet_addr(ip_address);
+	server_addr.sin_addr.s_addr=inet_addr(remote_info->ip_address);
 
 	while(1){
-		if(connect(sockfd,(struct sockaddr*)&server_addr, peerlen) < 0){
-    			current_attempt_times++;
-			if(current_attempt_times > MAX_CONNECT_ATTEMPT_TIMES){
-        			printf("Can Not Connect To Remote Device!,target ip =%s\n",ip_address);
+		sigset(SIGALRM, connect_alarm_handle);
+    		alarm(2);
+		connect_result = connect(sockfd,(struct sockaddr*)&server_addr, peerlen);
+		alarm(0);
+    		sigrelse(SIGALRM);
+			
+		if(connect_result < 0){
+			if(count_and_validate_connect_failure()){
+        			printf("Can Not Connect To Remote Device!,target ip =%s\n",remote_info->ip_address);
 				close(sockfd);
         			return ERROR_CONNECT_REMOTE_FAILED;
 			}
 			sleep(1);
     		}else{
-    			printf("Total connect time: %d s\n", current_attempt_times );
     			break;
     		}
 	}
@@ -66,8 +88,21 @@ int connect_to_remote_and_handle_resp(char* backhaul_ssid, char* ip_address)
 	printf("Calibrating Void lenses.\n");
 
 	memset(&send_operation,0,sizeof(send_operation));
-	send_operation.msg_type = MESH_MSG_TYPE_REMOTE_SET_RE_REQ;
-	strcat(send_operation.data,backhaul_ssid);
+	send_operation.msg_type = msg_type;
+	switch(msg_type){
+		case MESH_MSG_TYPE_REMOTE_SET_RE_REQ:
+			strcat(send_operation.data,remote_info->backhaul_ssid);
+			break;
+		case MESH_MSG_TYPE_REMOTE_RESTORE_RE_REQ:
+			strcat(send_operation.data,"remove");
+			break;
+		default:
+			printf("Error:Unknow message type: %d \n", msg_type);
+			close(sockfd);
+			return ERROR_UNKNOW_MESSAGE_TYPE;
+			
+	}
+	
 
 	printf("send: operation.msg_type=%d, operation.data=%s\n",send_operation.msg_type,send_operation.data);
 	
@@ -102,6 +137,18 @@ int connect_to_remote_and_handle_resp(char* backhaul_ssid, char* ip_address)
 				printf("Assimilation successful.\n");
 				break;
 			}
+		}else if(recv_operation.msg_type  == MESH_MSG_TYPE_REMOTE_RESTORE_RE_RESP){
+			printf("Verify server received data =%s\n", recv_operation.verifydata);
+
+			if(strcmp(recv_operation.verifydata,send_operation.data) != 0){
+				printf("Warning!!!: Data Verified Failed.There are transmission error.\n");
+			}
+
+			if(strcmp(recv_operation.data,MESSAGE_DATA_CONFIG_RE_RESP_PASS) == 0){
+				printf("Recv: Config RE sucessfully.\n");
+				break;
+			}
+			
 		}
 
         	memset(&recv_operation,0,sizeof(recv_operation));  
@@ -112,7 +159,7 @@ int connect_to_remote_and_handle_resp(char* backhaul_ssid, char* ip_address)
 	return recv_len;
 }
 
-int remote_config_re(char* backhaul_ssid,remote_device_info_struct* remote_info)
+int remote_config_re(remote_device_info_struct* remote_info)
 {
 	int result =0;
 	int recv_len = 0;
@@ -123,10 +170,32 @@ int remote_config_re(char* backhaul_ssid,remote_device_info_struct* remote_info)
 									remote_info->ssid,
 									remote_info->password);
 
-	recv_len = connect_to_remote_and_handle_resp(backhaul_ssid,remote_info->ip_address);
+	recv_len = connect_to_remote_and_handle_resp(MESH_MSG_TYPE_REMOTE_SET_RE_REQ, remote_info);
 
-	config_restore_from_repeater(remote_info->ip_address);
+	config_restore_from_repeater(DEFAULT_IP_ADDRESS);
 	
+	printf("recv_len = %d\n",recv_len);
+	
+	if(recv_len > 0){
+		printf("Successfully command remote device. 0(n_n)0\n");
+		result = 0;
+	}else{
+		printf("Failed to command remote device. :-(\n");
+		
+		result = recv_len;
+		error_string = error_code_to_string(result);
+		printf("ERROR:%s\n",error_string);
+	}
+	return result;
+}
+
+int remote_restore_re(remote_device_info_struct* remote_info){
+	int result =0;
+	int recv_len = 0;
+	char* error_string;
+
+	recv_len = connect_to_remote_and_handle_resp(MESH_MSG_TYPE_REMOTE_RESTORE_RE_REQ, remote_info);
+
 	printf("recv_len = %d\n",recv_len);
 	
 	if(recv_len > 0){

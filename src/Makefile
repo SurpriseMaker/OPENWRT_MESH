@@ -3,8 +3,8 @@ CROSS-COMPILE:=arm-openwrt-linux-muslgnueabi-
 CC := $(CROSS-COMPILE)gcc
 #LD:=$(CROSS-COMPILE)ld
 
-QL_MESH_OBJS:=mesh_config_main.o mesh_config_handle_command.o mesh_config_details.o mesh_client.o mesh_scan.o mesh_utils.o logger.o error_handle.o
-QL_SVR_OBJS:=mesh_server.o logger.o mesh_utils.o server_thread.o mesh_config_details.o error_handle.o
+QL_MESH_OBJS:=mesh_config_main.o mesh_config_handle_command.o mesh_config_cap.o mesh_client.o mesh_scan.o mesh_utils.o logger.o error_handle.o mesh_config_repeater.o mesh_config_re.o
+QL_SVR_OBJS:=mesh_server.o logger.o mesh_utils.o server_thread.o mesh_config_re.o error_handle.o mesh_config_cap.o
 TARGET:=meshserver meshconfig
 
 release:$(TARGET)

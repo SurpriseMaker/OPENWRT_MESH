@@ -30,9 +30,9 @@
  *  Minior: When more functions are added
  *  Patch:  When fix issues or  get improved.
  */
-#define MESH_CONFIG_VERSION "Version 0.8.9.4"
+#define MESH_CONFIG_VERSION "Version 0.9.9.5"
 
-#define REMOTE_IP_ADDRESS	 "192.168.3.1"
+#define DEFAULT_IP_ADDRESS	 "192.168.3.1"
 #define TEMP_IP_ADDRESS "192.168.3.2"
 
 #define streq(a,b) ((strlen(a) == strlen(b)) && (strncasecmp(a,b,strlen(b)) == 0))
@@ -41,8 +41,7 @@ char* my_system(const char *cmd);
 void execute_cmds(char *arg);
 void execute_cmds_2(char *arg1, char *arg2);
 
-bool is_mesh_cap_mode(char* mode);
-bool is_mesh_re_mode(char* mode);
+
 char* get_mesh_mode();
 
 FILE *  my_popen(const char *cmdstring, const char *type)  ;

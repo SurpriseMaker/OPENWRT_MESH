@@ -12,7 +12,7 @@ Date: 2020-11-23
 #include"mesh_server.h"
 
 
-int handle_command_set_cap_mode (int argc, char *argv[]){
+int handle_command_set_mode_cap_auto (int argc, char *argv[]){
 	char* backhaul_ssid;
 
 	if(argc > 2){
@@ -22,10 +22,10 @@ int handle_command_set_cap_mode (int argc, char *argv[]){
 	}
 
 	printf("para: backhaul_ssid =%s \n",backhaul_ssid);
-	return check_and_set_cap_mode(backhaul_ssid);
+	return check_and_set_mode_cap_auto(backhaul_ssid);
 }
 
-int handle_command_set_re_mode (int argc, char *argv[]){
+int handle_command_set_mode_re_auto (int argc, char *argv[]){
 	char* backhaul_ssid;
 
 	if(argc > 2){
@@ -35,7 +35,7 @@ int handle_command_set_re_mode (int argc, char *argv[]){
 	}
 
 	printf("para: backhaul_ssid =%s \n",backhaul_ssid);
-	return check_and_set_re_mode(backhaul_ssid);
+	return check_and_set_mode_re_auto(backhaul_ssid);
 	
 }
 
@@ -118,11 +118,10 @@ int handle_command_set_password(int argc, char *argv[]){
 
 int handle_command_remote_config_re(int argc, char *argv[]){
 	remote_device_info_struct remote_info={0};
-	char* backhaul_ssid;
 	int result = 0;
 	
 	if(argc > 4){
-		backhaul_ssid=argv[2];
+		remote_info.backhaul_ssid=argv[2];
 		remote_info.bssid = argv[3];
 		remote_info.ssid = argv[4];
 		if(argc > 5){
@@ -131,9 +130,9 @@ int handle_command_remote_config_re(int argc, char *argv[]){
 			remote_info.password = NULL;
 		}
 
-		remote_info.ip_address = REMOTE_IP_ADDRESS;
+		remote_info.ip_address = DEFAULT_IP_ADDRESS;
 
-		result = remote_config_re(backhaul_ssid,&remote_info);		
+		result = remote_config_re(&remote_info);		
 	} else {
 		printf("Paremeters too few.\n");
 		result = -1;
@@ -159,6 +158,22 @@ int handle_command_restore_to_normal_mode(int argc, char *argv[]){
 	}
 
 	return 0;
+}
+
+int handle_command_set_remote_device_to_normal_mode(int argc, char *argv[]){
+	remote_device_info_struct remote_info={0};
+	int result = 0;
+
+	if(argc > 2){
+		remote_info.ip_address = argv[2];
+	}else{
+		printf("Paremeters too few.\n");
+		result = -1;
+	}
+
+	remote_restore_re(&remote_info);
+
+	return result;
 }
 
 int handle_command_get_topology(int argc, char *argv[]){

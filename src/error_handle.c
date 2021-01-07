@@ -12,6 +12,8 @@ char*  error_code_to_string(mesh_connect_error_code error_code){
 			return STRING_CONNECT_REMOTE_FAILED;
 		case ERROR_SEND_FAILED:
 			return STRING_SEND_FAILED;
+		case ERROR_UNKNOW_MESSAGE_TYPE:
+			return STRING_UNKNOW_ERROR;
 		default:
 			return STRING_UNKNOW_ERROR;
 	}

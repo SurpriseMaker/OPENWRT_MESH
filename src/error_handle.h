@@ -5,6 +5,7 @@
 #define STRING_BIND_FAILED "Bind failed!"
 #define STRING_CONNECT_REMOTE_FAILED "Failed to connect to remote device!"
 #define STRING_SEND_FAILED "Failed to send message to remote device !"
+#define STRING_UNKNOW_MESSAGE_TYPE "Unknow message type!"
 #define STRING_UNKNOW_ERROR "Unknow error."
 
 typedef enum{
@@ -12,6 +13,7 @@ typedef enum{
 	ERROR_BIND_FAILED = -2,
 	ERROR_CONNECT_REMOTE_FAILED = -3,
 	ERROR_SEND_FAILED = -4,
+	ERROR_UNKNOW_MESSAGE_TYPE = -5,
 }mesh_connect_error_code;
 
 char*  error_code_to_string(mesh_connect_error_code error_code);

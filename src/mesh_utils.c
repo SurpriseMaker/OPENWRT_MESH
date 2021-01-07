@@ -20,6 +20,7 @@
 #include <sys/inotify.h>
 #include <signal.h>
 #include "logger.h"
+#include <sys/wait.h>
 
 
 #include    <sys/wait.h>  
@@ -37,20 +38,22 @@ char* my_system(const char *cmd)
 	char buf[32] = {0};
 	FILE *fp = NULL;
 	int readn = 0;
+	int status =0xff;
 
 	memset(cmd_result,0,sizeof(cmd_result));
 	if( (fp = popen(cmd, "r")) == NULL )
 	{
 		printf("popen error!\n");
 	}else{
-		while(!feof(fp)){
+		while(!feof(fp) ){
 			readn = fread(buf, sizeof(char), sizeof(buf), fp);
 			if(readn == 0){
 				if(errno == EINTR){
 					printf("EINTR Detected \n");
 					continue;
-				}else{
+				}else{			
 					break;
+					//wait(&status);
 				}
 			}
 
@@ -59,10 +62,10 @@ char* my_system(const char *cmd)
 			
 		}
 
-		pclose(fp);
+		status = pclose(fp);
 	}
 
-	printf("Finished cmd: %s\n", cmd);
+	printf("Finished cmd: %s, status =%d\n", cmd,status);
 	return cmd_result;
 }
 
@@ -82,27 +85,7 @@ void execute_cmds_2(char *arg1, char *arg2)
 	my_system(target_cmd);
 }
 	
-bool is_mesh_cap_mode(char* mode)
-{
-	bool ret = false;
-	
-	if (! strncmp(mode,"ap",2)){
-		ret =  true;
-	} 
 
-	return ret;
-}
-
-bool is_mesh_re_mode(char* mode)
-{
-	bool ret = false;
-	
-	if (! strncmp(mode,"sta",3)){
-		ret =  true;
-	} 
-
-	return ret;
-}
 
 char* get_mesh_mode(){
 	return my_system("uci get wireless.back1.mode");

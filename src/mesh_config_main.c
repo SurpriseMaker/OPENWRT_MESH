@@ -15,18 +15,21 @@ Date: 2020-11-26
 
 /*To be more explicit, manage all the meshconfig commands in this array.*/
 const mesh_cmd_struct mesh_cmd_config[MESH_CMD_MAX] = {
-		{"capmode",	"Config as CAP. e.g. capmode [backhaul SSID]",	handle_command_set_cap_mode},
-		{"remode",	"Config as RE. e.g. remode [backhaul SSID]",	handle_command_set_re_mode},
-		{"getmode",	"Get mode(CAP/RE/Nomal)",	handle_command_get_mode},
+		{"mode.cap.auto",	"Config as CAP. e.g. mode.cap.auto [backhaul SSID]",	handle_command_set_mode_cap_auto},
+		{"mode.cap.wps",	"Config as CAP and need press WPS button to connect.",		handle_command_set_cap_wps_mode},
+		{"mode.re.auto",	"Config as RE. e.g. mode.re.auto [backhaul SSID]",	handle_command_set_mode_re_auto},
+		{"mode.re.wps",		"Config as RE and need press WPS button to connect.",	handle_command_set_re_wps_mode},
+		{"mode.re.remote",		"Remote config a device to be RE. e.g.  mode.re.remote  <backhaul SSID><bssid><ssid>[password]",		handle_command_remote_config_re},
+		{"mode.normal",		"Restore to normal mode.", 		handle_command_restore_to_normal_mode},
+		{"mode.normal.remote",	"Set remote device to normal mode. e.g. mode.normal.remote <ip address>",		handle_command_set_remote_device_to_normal_mode},
+		{"mode.get",	"Get mode(CAP/RE/Nomal)",	handle_command_get_mode},
 		{"showlink",	"Show link status",	handle_command_show_link_status},
 		{"scan",		"Scan wireless",	handle_command_scan_wireless},
-		{"setssid",	"Set SSID, e.g. setssid <SSID>",	handle_command_set_SSID},
-		{"setpwd",	"Set Password, e.g. setpwd <password>",		handle_command_set_password},
-		{"rcre",		"Remote config RE. e.g.  rcre  <backhaul SSID><bssid><ssid>[password]",		handle_command_remote_config_re},
-		{"normalmode",		"Restore to normal mode.", 		handle_command_restore_to_normal_mode},
-		{"gettopo",	"Get topology",	handle_command_get_topology},
-		{"capwps",	"Config as CAP and need press WPS button to connect.",		handle_command_set_cap_wps_mode},
-		{"rewps",		"Config as RE and need press WPS button to connect.",	handle_command_set_re_wps_mode},
+		{"set.ssid",	"Set SSID, e.g. set.ssid <SSID>",	handle_command_set_SSID},
+		{"set.password",	"Set Password, e.g. set.password <password>",		handle_command_set_password},			
+		{"topo.get",	"Get topology",	handle_command_get_topology},
+		
+		
 		//Add new cmd above.
 };
 
