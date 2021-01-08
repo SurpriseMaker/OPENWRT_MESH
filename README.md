@@ -82,6 +82,7 @@ meshconfig/
       |——topology.sh  拓扑信息查询脚本
       
 |——src
+
       |——error_handle.c   异常处理
       |——error_handle.h
       |——logger.c   日志记录
@@ -119,7 +120,7 @@ C/S交互...
 7行代码实现主函数（对比OPENWRT原生，例如wlanconfig主函数100+行，同样的效果）
 
 主函数：
-
+```c
 int main(int argc, char *argv[])
 {
 
@@ -138,12 +139,13 @@ int main(int argc, char *argv[])
 
         return status;	
 }
-
+```
 ### 结构化组织
 将指令名、指令说明、实现接口组织到一起，便于修改和查询。
-
+```bash
 /*To be more explicit, manage all the meshconfig commands in this array.*/
 const mesh_cmd_struct mesh_cmd_config[MESH_CMD_MAX] = {
+
 		{"mode.cap.auto",	"Config as CAP. e.g. mode.cap.auto [backhaul SSID]",	handle_command_set_mode_cap_auto},
 		{"mode.cap.wps",	"Config as CAP and need press WPS button to connect.",		handle_command_set_cap_wps_mode},
 		{"mode.re.auto",	"Config as RE. e.g. mode.re.auto [backhaul SSID]",	handle_command_set_mode_re_auto},
@@ -161,8 +163,9 @@ const mesh_cmd_struct mesh_cmd_config[MESH_CMD_MAX] = {
 		
 		//Add new cmd above.
 };
-
+```
 ### 使用管道+shell实现telnet自动登录执行拓扑查询
+```c
 ip="127.0.0.1"
 port=7777
 
@@ -178,7 +181,7 @@ exec 8<>$inputfile
 telnet $ip $port <&8 &
 sleep 1; echo $input1 >> $inputfile   
 echo $input2 >> $inputfile 
-
+```
 
 更新日期：2021-1-8
 作者：GentlemanTsao
