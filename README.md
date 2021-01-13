@@ -9,16 +9,38 @@ meshconfig
 
 ### 指令选项:
 
-#### capmode		
-设置device作为WIFISON的CAP角色
+#### mode.cap.auto		
+设置device作为WIFISON的CAP角色,并自行组网
 
-#### remode			
-设置device作为WIFISON的RE角色
+#### mode.cap.wps
+设置device作为WIFISON的CAP角色，需按WPS键组网
 
-#### rn
+#### mode.re.auto			
+设置device作为WIFISON的RE角色，并自行组网
+
+#### mode.re.wps
+设置device作为WIFISON的RE角色，需按WPS键组网
+
+#### mode.re.remote
+远程设置RE，从主路由（CAP）通过无线连接将新设备设置为RE
+
+举例：
+mode.re.remote <backhaul id> <bssid> <ssid> [password]
+
+远程设置RE指令封装了如下过程：
+1. CAP作为STA连接到远端设备
+2. CAP与远端设备建立TCP连接
+3. CAP发送控制命令
+4. 远端设备接收并执行命令后返回
+5. CAP接收返回信息，将自己回退到CAP模式
+
+#### mode.normal
 回复到normal状态
 
-#### getmode			
+#### mode.normal.remote
+远程移除RE，从主路由（CAP）通过无线连接将已连接设备设置为normal，等效为移除已连接设备。
+
+#### mode.get
 获取device当前角色(CAP/RE/Nomal)
 
 #### showlink		
@@ -27,27 +49,15 @@ meshconfig
 #### scan			
 搜索并发现新设备
 
-#### setssid			
+#### set.ssid			
 设置本机SSID
 
-#### setpwd			
+#### set.pwd			
 设置本机密码
 
-#### rcre			
-远程控制，通过TCP连接将新设备设置作为RE
+#### topo.get
+查询拓扑信息
 
-举例：
-rcre <bssid> <ssid> [password]
-
-Remote config RE via TCP steps:（远程控制步骤）
-1. CAP作为STA连接到远端设备
-2. CAP与远端设备建立TCP连接
-3. CAP发送控制命令
-4. 远端设备接收并执行命令后返回
-5. CAP接收返回信息，将自己回退到CAP模式
-
-#### gettopo
-获取拓扑信息
 
 ### 用法：
 系统调用，可ssh连接路由器后输入meshconfig，也可以在应用中调用。
@@ -73,15 +83,19 @@ meshconfig/
       
 |——src
 
+      |——error_handle.c   异常处理
+      |——error_handle.h
       |——logger.c   日志记录
       |——logger.h   
       |——Makefile
       |——mesh_client.c    远程通信的C端，发送控制指令，接收反馈
       |——mesh_config.h
-      |——mesh_config_details.c      负责指令具体执行
+      |——mesh_config_cap.c      负责CAP端设置
       |——mesh_config_details.h
       |——mesh_config_handle_command.c   负责指令解析
       |——mesh_config_main.c   主函数，负责指令识别与分发
+      |——mesh_config_re.c    负责RE端设置
+      |——mesh_config_repeater.c    repeater设置
       |——mesh_scan.c    负责搜索设备
       |——mesh_server.c  远程通信的S端，开辟单独线程
       |——mesh_server.h
@@ -106,7 +120,7 @@ C/S交互...
 7行代码实现主函数（对比OPENWRT原生，例如wlanconfig主函数100+行，同样的效果）
 
 主函数：
-
+```c
 int main(int argc, char *argv[])
 {
 
@@ -123,28 +137,35 @@ int main(int argc, char *argv[])
 
 	status = handle_command(argc, argv);
 
-       return status;	
+        return status;	
 }
-
+```
 ### 结构化组织
 将指令名、指令说明、实现接口组织到一起，便于修改和查询。
-
+```bash
+/*To be more explicit, manage all the meshconfig commands in this array.*/
 const mesh_cmd_struct mesh_cmd_config[MESH_CMD_MAX] = {
 
-		{"capmode",	"Config as CAP. e.g. capmode <backhaul SSID>",	handle_command_set_cap_mode},
-		{"remode",	"Config as RE. e.g. remode <backhaul SSID>",	handle_command_set_re_mode},
-		{"getmode",	"Get mode(CAP/RE/Nomal)",	handle_command_get_mode},
+		{"mode.cap.auto",	"Config as CAP. e.g. mode.cap.auto [backhaul SSID]",	handle_command_set_mode_cap_auto},
+		{"mode.cap.wps",	"Config as CAP and need press WPS button to connect.",		handle_command_set_cap_wps_mode},
+		{"mode.re.auto",	"Config as RE. e.g. mode.re.auto [backhaul SSID]",	handle_command_set_mode_re_auto},
+		{"mode.re.wps",		"Config as RE and need press WPS button to connect.",	handle_command_set_re_wps_mode},
+		{"mode.re.remote",		"Remote config a device to be RE. e.g.  mode.re.remote  <backhaul SSID><bssid><ssid>[password]",		handle_command_remote_config_re},
+		{"mode.normal",		"Restore to normal mode.", 		handle_command_restore_to_normal_mode},
+		{"mode.normal.remote",	"Set remote device to normal mode. e.g. mode.normal.remote <ip address>",		handle_command_set_remote_device_to_normal_mode},
+		{"mode.get",	"Get mode(CAP/RE/Nomal)",	handle_command_get_mode},
 		{"showlink",	"Show link status",	handle_command_show_link_status},
 		{"scan",		"Scan wireless",	handle_command_scan_wireless},
-		{"setssid",	"Set SSID, e.g. setssid <SSID>",	handle_command_set_SSID},
-		{"setpwd",	"Set Password, e.g. setpwd <password>",		handle_command_set_password},
-		{"rcre",		"Remote config RE. e.g.  rcre  <backhaul SSID><bssid><ssid>[password]",		handle_command_remote_config_re},
-		{"normalmode",		"Restore to normal mode.", 		handle_command_restore_to_normal_mode},
-		{"gettopo",	"Get topology",	handle_command_get_topology},
+		{"set.ssid",	"Set SSID, e.g. set.ssid <SSID>",	handle_command_set_SSID},
+		{"set.password",	"Set Password, e.g. set.password <password>",		handle_command_set_password},			
+		{"topo.get",	"Get topology",	handle_command_get_topology},
+		
+		
 		//Add new cmd above.
 };
-
+```
 ### 使用管道+shell实现telnet自动登录执行拓扑查询
+```c
 ip="127.0.0.1"
 port=7777
 
@@ -160,9 +181,9 @@ exec 8<>$inputfile
 telnet $ip $port <&8 &
 sleep 1; echo $input1 >> $inputfile   
 echo $input2 >> $inputfile 
+```
 
-
-更新日期：2020-12-24
+更新日期：2021-1-8
 作者：GentlemanTsao
 
 # [WIFISON]路由器自组网控制指令开发使用手册
