@@ -43,13 +43,13 @@ char* my_system(const char *cmd)
 	memset(cmd_result,0,sizeof(cmd_result));
 	if( (fp = popen(cmd, "r")) == NULL )
 	{
-		printf("popen error!\n");
+		dbg_time("popen error!\n");
 	}else{
 		while(!feof(fp) ){
 			readn = fread(buf, sizeof(char), sizeof(buf), fp);
 			if(readn == 0){
 				if(errno == EINTR){
-					printf("EINTR Detected \n");
+					dbg_time("EINTR Detected \n");
 					continue;
 				}else{			
 					break;
@@ -65,7 +65,7 @@ char* my_system(const char *cmd)
 		status = pclose(fp);
 	}
 
-	printf("Finished cmd: %s, status =%d\n", cmd,status);
+	dbg_time("Finished cmd: %s, status =%d\n", cmd,status);
 	return cmd_result;
 }
 

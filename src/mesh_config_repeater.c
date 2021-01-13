@@ -55,7 +55,7 @@ int config_as_repeater_and_restart(char* ip_address,char* bssid,char* ssid,char*
 	execute_cmds("uci set firewall.@zone[0].network=\"lan wwan\"");
 	execute_cmds("uci commit firewall");
 
-	printf("Connecting...\n");
+	dbg_time("Connecting...\n");
 	execute_cmds("/etc/init.d/network restart");
 	
 	return 0;

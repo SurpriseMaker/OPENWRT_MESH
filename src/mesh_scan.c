@@ -69,7 +69,7 @@ static void parse_list_buffer(int *index,char *buffer)
 	}
 
 	if(*index == 1){
-		printf("%s",buffer);
+		dbg_time("%s",buffer);
 	}
 
 	(*index)++;

@@ -36,7 +36,7 @@ const mesh_cmd_struct mesh_cmd_config[MESH_CMD_MAX] = {
 
 static inline int do_nothing (int argc, char *argv[])
 {
-    printf("options:%s is invalid.\n", argv[1]);
+    dbg_time("options:%s is invalid.\n", argv[1]);
     /*Do nothing*/
     return 0;
 }

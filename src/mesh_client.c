@@ -23,7 +23,7 @@ int count_and_validate_connect_failure(){
 }
 
 void connect_alarm_handle(){
-	printf("Connect blocked more than 2 seconds!!! Please check connect parameters!\n");
+	dbg_time("Connect blocked more than 2 seconds!!! Please check connect parameters!\n");
 	count_and_validate_connect_failure();
 	count_and_validate_connect_failure();
 }
@@ -31,7 +31,6 @@ void connect_alarm_handle(){
 int connect_to_remote_and_handle_resp(int msg_type, remote_device_info_struct* remote_info)
 {
 	int sockfd,recv_len;
-	int current_attempt_times = 0;
 
 	struct sockaddr_in client_addr;
 	struct sockaddr_in server_addr;
@@ -46,7 +45,7 @@ int connect_to_remote_and_handle_resp(int msg_type, remote_device_info_struct* r
 		return ERROR_CREATE_SOCKET_FAILED;
 	}
 
-	printf("Socket is created successfully.\n");
+	dbg_time("Socket is created successfully.\n");
 	
 	bzero(&client_addr,sizeof(client_addr)); 
     	client_addr.sin_family = AF_INET;    
@@ -54,12 +53,12 @@ int connect_to_remote_and_handle_resp(int msg_type, remote_device_info_struct* r
     	client_addr.sin_port = htons(0); 
 
 	if( bind(sockfd,(struct sockaddr*)&client_addr,sizeof(client_addr))){
-        	printf("Bind Port Failed!\n"); 
+        	dbg_time("Bind Port Failed!\n"); 
 		close(sockfd);
         	return ERROR_BIND_FAILED;
     	}
 
-	printf("Bind successfully.\n");
+	dbg_time("Bind successfully.\n");
 	
 	memset(&server_addr,0,sizeof(server_addr));
 	server_addr.sin_family=AF_INET;
@@ -75,7 +74,7 @@ int connect_to_remote_and_handle_resp(int msg_type, remote_device_info_struct* r
 			
 		if(connect_result < 0){
 			if(count_and_validate_connect_failure()){
-        			printf("Can Not Connect To Remote Device!,target ip =%s\n",remote_info->ip_address);
+        			dbg_time("Can Not Connect To Remote Device!,target ip =%s\n",remote_info->ip_address);
 				close(sockfd);
         			return ERROR_CONNECT_REMOTE_FAILED;
 			}
@@ -85,7 +84,7 @@ int connect_to_remote_and_handle_resp(int msg_type, remote_device_info_struct* r
     		}
 	}
 
-	printf("Calibrating Void lenses.\n");
+	dbg_time("Calibrating Void lenses.\n");
 
 	memset(&send_operation,0,sizeof(send_operation));
 	send_operation.msg_type = msg_type;
@@ -97,22 +96,22 @@ int connect_to_remote_and_handle_resp(int msg_type, remote_device_info_struct* r
 			strcat(send_operation.data,"remove");
 			break;
 		default:
-			printf("Error:Unknow message type: %d \n", msg_type);
+			dbg_time("Error:Unknow message type: %d \n", msg_type);
 			close(sockfd);
 			return ERROR_UNKNOW_MESSAGE_TYPE;
 			
 	}
 	
 
-	printf("send: operation.msg_type=%d, operation.data=%s\n",send_operation.msg_type,send_operation.data);
+	dbg_time("send: operation.msg_type=%d, operation.data=%s\n",send_operation.msg_type,send_operation.data);
 	
 	if(send(sockfd,&send_operation,sizeof(send_operation),0)<0){
-		printf("send failed !Annihilation commencing.\n");
+		dbg_time("send failed !Annihilation commencing.\n");
 		close(sockfd);
         	return ERROR_SEND_FAILED;
 	}
 
-	printf("Synchronizing.\n");
+	dbg_time("Synchronizing.\n");
 		
 	tv_out.tv_sec = 2;
 	tv_out.tv_usec = 0;
@@ -123,29 +122,29 @@ int connect_to_remote_and_handle_resp(int msg_type, remote_device_info_struct* r
 	while( (recv_len = recv(sockfd,&recv_operation,sizeof(recv_operation),0)) > 0)
     	{
        	dbg_time("Recv: len = %d,data = %s\n",recv_len,recv_operation.data);
-		printf("Recv: len = %d,data = %s\n",recv_len,recv_operation.data);
+		dbg_time("Recv: len = %d,data = %s\n",recv_len,recv_operation.data);
 
 		if(recv_operation.msg_type  == MESH_MSG_TYPE_REMOTE_SET_RE_RESP){
-			printf("Verify server received data =%s\n", recv_operation.verifydata);
+			dbg_time("Verify server received data =%s\n", recv_operation.verifydata);
 
 			if(strcmp(recv_operation.verifydata,send_operation.data) != 0){
-				printf("Warning!!!: Data Verified Failed.There are transmission error.\n");
+				dbg_time("Warning!!!: Data Verified Failed.There are transmission error.\n");
 			}
 			
 			if(strcmp(recv_operation.data,MESSAGE_DATA_CONFIG_RE_RESP_PASS) == 0){
-				printf("Recv: Config RE sucessfully.\n");
-				printf("Assimilation successful.\n");
+				dbg_time("Recv: Config RE sucessfully.\n");
+				dbg_time("Assimilation successful.\n");
 				break;
 			}
 		}else if(recv_operation.msg_type  == MESH_MSG_TYPE_REMOTE_RESTORE_RE_RESP){
-			printf("Verify server received data =%s\n", recv_operation.verifydata);
+			dbg_time("Verify server received data =%s\n", recv_operation.verifydata);
 
 			if(strcmp(recv_operation.verifydata,send_operation.data) != 0){
-				printf("Warning!!!: Data Verified Failed.There are transmission error.\n");
+				dbg_time("Warning!!!: Data Verified Failed.There are transmission error.\n");
 			}
 
 			if(strcmp(recv_operation.data,MESSAGE_DATA_CONFIG_RE_RESP_PASS) == 0){
-				printf("Recv: Config RE sucessfully.\n");
+				dbg_time("Recv: Config RE sucessfully.\n");
 				break;
 			}
 			
@@ -174,17 +173,17 @@ int remote_config_re(remote_device_info_struct* remote_info)
 
 	config_restore_from_repeater(DEFAULT_IP_ADDRESS);
 	
-	printf("recv_len = %d\n",recv_len);
+	dbg_time("recv_len = %d\n",recv_len);
 	
 	if(recv_len > 0){
-		printf("Successfully command remote device. 0(n_n)0\n");
+		dbg_time("Successfully command remote device. 0(n_n)0\n");
 		result = 0;
 	}else{
-		printf("Failed to command remote device. :-(\n");
+		dbg_time("Failed to command remote device. :-(\n");
 		
 		result = recv_len;
 		error_string = error_code_to_string(result);
-		printf("ERROR:%s\n",error_string);
+		dbg_time("ERROR:%s\n",error_string);
 	}
 	return result;
 }
@@ -196,17 +195,17 @@ int remote_restore_re(remote_device_info_struct* remote_info){
 
 	recv_len = connect_to_remote_and_handle_resp(MESH_MSG_TYPE_REMOTE_RESTORE_RE_REQ, remote_info);
 
-	printf("recv_len = %d\n",recv_len);
+	dbg_time("recv_len = %d\n",recv_len);
 	
 	if(recv_len > 0){
-		printf("Successfully command remote device. 0(n_n)0\n");
+		dbg_time("Successfully command remote device. 0(n_n)0\n");
 		result = 0;
 	}else{
-		printf("Failed to command remote device. :-(\n");
+		dbg_time("Failed to command remote device. :-(\n");
 		
 		result = recv_len;
 		error_string = error_code_to_string(result);
-		printf("ERROR:%s\n",error_string);
+		dbg_time("ERROR:%s\n",error_string);
 	}
 	return result;
 }

@@ -9,7 +9,8 @@
 #include <stdbool.h>
 
 
-#define STD_OUT 0
+#define STD_OUT 1
+#define LOG_ENABLE 1
 
 #define dbg_time(fmt, args...) do { \
 	log_debug(LOG_DEBUG, "[MESH: %s:%d] " fmt, __func__, __LINE__, ## args); \

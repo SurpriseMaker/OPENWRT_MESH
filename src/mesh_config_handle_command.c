@@ -21,7 +21,7 @@ int handle_command_set_mode_cap_auto (int argc, char *argv[]){
 		backhaul_ssid = DEFAULT_BACKHAUL_SSID;
 	}
 
-	printf("para: backhaul_ssid =%s \n",backhaul_ssid);
+	dbg_time("para: backhaul_ssid =%s \n",backhaul_ssid);
 	return check_and_set_mode_cap_auto(backhaul_ssid);
 }
 
@@ -34,7 +34,7 @@ int handle_command_set_mode_re_auto (int argc, char *argv[]){
 		backhaul_ssid = DEFAULT_BACKHAUL_SSID;
 	}
 
-	printf("para: backhaul_ssid =%s \n",backhaul_ssid);
+	dbg_time("para: backhaul_ssid =%s \n",backhaul_ssid);
 	return check_and_set_mode_re_auto(backhaul_ssid);
 	
 }
@@ -89,7 +89,7 @@ int handle_command_set_SSID(int argc, char *argv[]){
 		execute_cmds("/etc/init.d/network restart");
 		result = 0;	
 	}else{
-		printf("aguement not set !\n");
+		dbg_time("aguement not set !\n");
 		result = -1;
 	}
 	
@@ -108,7 +108,7 @@ int handle_command_set_password(int argc, char *argv[]){
 		execute_cmds("uci commit wireless");
 		execute_cmds("/etc/init.d/network restart");
 	}else{
-		printf("aguement not set !\n");
+		dbg_time("aguement not set !\n");
 		result = -1;
 	}
 	
@@ -134,7 +134,7 @@ int handle_command_remote_config_re(int argc, char *argv[]){
 
 		result = remote_config_re(&remote_info);		
 	} else {
-		printf("Paremeters too few.\n");
+		dbg_time("Paremeters too few.\n");
 		result = -1;
 	}
 	return result;
@@ -148,13 +148,13 @@ int handle_command_restore_to_normal_mode(int argc, char *argv[]){
 	dbg_time("handle_command_get_mode: mode = %d",mode);
 
 	if(is_mesh_cap_mode(mode)){
-		printf("Current mode is CAP mode,now restoring to normal...\n");
+		dbg_time("Current mode is CAP mode,now restoring to normal...\n");
 		restore_from_cap_mode_and_restart();
 	} else if(is_mesh_re_mode(mode)){
-		printf("Current mode is RE mode,now restoring to normal...\n");
+		dbg_time("Current mode is RE mode,now restoring to normal...\n");
 		restore_from_re_mode_and_restart();
 	}else{
-		printf("Current mode is normal mode, it's unnecessary to restore.\n");
+		dbg_time("Current mode is normal mode, it's unnecessary to restore.\n");
 	}
 
 	return 0;
@@ -167,7 +167,7 @@ int handle_command_set_remote_device_to_normal_mode(int argc, char *argv[]){
 	if(argc > 2){
 		remote_info.ip_address = argv[2];
 	}else{
-		printf("Paremeters too few.\n");
+		dbg_time("Paremeters too few.\n");
 		result = -1;
 	}
 
@@ -181,7 +181,7 @@ int handle_command_get_topology(int argc, char *argv[]){
 	
 	scan_result = get_topology();
 
-	printf("%s\n",scan_result);
+	dbg_time("%s\n",scan_result);
 	return 0;
 }
 

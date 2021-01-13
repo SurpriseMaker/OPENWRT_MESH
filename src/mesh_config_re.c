@@ -195,8 +195,8 @@ int check_and_set_mode_re_auto(char* backhaul_ssid)
 	mode = get_mesh_mode();
 
 	if(is_mesh_cap_mode(mode)){
-		printf("Can't set re mode because current mode is cap.");
-		printf("Now restore the cap settings first.");
+		dbg_time("Can't set re mode because current mode is cap.");
+		dbg_time("Now restore the cap settings first.");
 		restore_from_cap_mode();
 	}
 	mesh_re_delete_old_settings();
