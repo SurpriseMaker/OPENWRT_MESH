@@ -103,6 +103,15 @@ void config_as_re_mode(char* backhaul_ssid)
 	execute_cmds("uci set wsplcd.config.ConfigSta=0");
 	execute_cmds("uci commit wsplcd");
 
+	execute_cmds("uci delete network.lan4");
+	execute_cmds("uci add network interface");
+	execute_cmds("uci rename network.@interface[-1]=lan4");
+	execute_cmds("uci set network.lan4.ifname='@lan'");
+	execute_cmds("uci set network.lan4.proto=static");
+	execute_cmds("uci set network.lan4.ipaddr=192.168.5.1");
+	execute_cmds("uci set network.lan4.netmask=255.255.255.0");
+	execute_cmds("uci commit network");
+
 }
 
 void config_as_re_mode_and_restart(char* backhaul_ssid)
@@ -161,6 +170,9 @@ void restore_from_re_mode(){
 	execute_cmds("uci set wsplcd.config.HyFiSecurity=0");
 	execute_cmds("uci del_list wsplcd.config.ConfigSta=0");
 	execute_cmds("uci commit wsplcd");
+
+	execute_cmds("uci delete network.lan4");
+	execute_cmds("uci commit network");
 }
 
 void restore_from_re_mode_and_restart(){

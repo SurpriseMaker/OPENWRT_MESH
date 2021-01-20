@@ -30,7 +30,7 @@
  *  Minior: When more functions are added
  *  Patch:  When fix issues or  get improved.
  */
-#define MESH_CONFIG_VERSION "Version 0.9.9.6"
+#define MESH_CONFIG_VERSION "Version 0.9.9.8"
 
 #define DEFAULT_IP_ADDRESS	 "192.168.3.1"
 #define TEMP_IP_ADDRESS "192.168.3.2"

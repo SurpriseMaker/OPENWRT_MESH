@@ -10,7 +10,7 @@ port=7777
 
 inputfile=in 
 input1="td s2"
-input2="exit"
+input2="q"
 
 rm -fr $inputfile    
 mknod $inputfile p  
